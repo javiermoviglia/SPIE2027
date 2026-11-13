@@ -96,7 +96,7 @@
     const toggle = document.getElementById('toggle');
     const stop = document.getElementById('stop');
     const status = document.getElementById('status');
-    const content = document.getElementById('ar-content');
+    const content = Array.from(document.querySelectorAll('[mindar-image-target] > a-entity'));
     const errorPanel = document.getElementById('error-panel');
     const errorMessage = document.getElementById('error-message');
 
@@ -111,8 +111,9 @@
       errorPanel.style.display = 'block';
     });
     toggle.addEventListener('click', () => {
-      content.object3D.visible = !content.object3D.visible;
-      toggle.textContent = content.object3D.visible ? 'Hide 3D' : 'Show 3D';
+      const show = !content[0].object3D.visible;
+      content.forEach(entity => { entity.object3D.visible = show; });
+      toggle.textContent = show ? 'Hide 3D' : 'Show 3D';
     });
     stop.addEventListener('click', () => location.reload());
   </script>
