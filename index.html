@@ -26,7 +26,7 @@
           document.querySelector('#bottom').classList.add('found');
         });
         this.el.addEventListener('targetLost', () => {
-          document.querySelector('#status').textContent='Point at the example target';
+          document.querySelector('#status').textContent='Scan one of the four target images';
           document.querySelector('#bottom').classList.remove('found');
         });
       }
@@ -35,14 +35,14 @@
 </head>
 <body>
   <div class="hud" id="hud">
-    <div class="top"><div class="eyebrow">SPIE 2027 · Prototype</div><div class="title">Graph-Based Surgical Navigation</div><div class="help">Point your camera at the MindAR example image. The 3D scene is anchored to it.</div></div>
+    <div class="top"><div class="eyebrow">SPIE 2027 · Prototype</div><div class="title">Graph-Based Surgical Navigation</div><div class="help">Scan any of the <a href="target.html" target="_blank" style="color:#81dce5;pointer-events:auto">four sample images</a> to view its 3D scene.</div></div>
     <div class="bottom" id="bottom"><div class="status"><span class="dot"></span><span id="status">Starting camera…</span></div><div class="actions"><button class="btn" id="toggle" disabled>Hide 3D</button><button class="btn" id="stop" disabled>Reload</button></div></div>
   </div>
   <div class="error-panel" id="error-panel" role="alert"><span id="error-message"></span><br><button class="btn" onclick="location.reload()">Retry camera</button></div>
   <!-- Compiled target and printed image must match (MindAR official example). -->
   <div class="ar-container">
   <a-scene
-    mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; autoStart: true; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1; filterMinCF: 0.001; filterBeta: 0.05; warmupTolerance: 5; missTolerance: 8;"
+    mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/lertsoft/temporarily_closed@main/ar-assets/targets.mind; autoStart: true; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1; filterMinCF: 0.001; filterBeta: 0.05; warmupTolerance: 5; missTolerance: 8;"
     embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights: true; alpha: true;"
     vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -75,6 +75,43 @@
         </a-entity>
       </a-entity>
     </a-entity>
+
+    <a-entity mindar-image-target="targetIndex: 1" target-events>
+      <a-entity position="0 0 0.12">
+        <a-text value="ULTRASOUND" align="center" color="#ffffff" width="1.15" position="0 0.38 0.06"></a-text>
+        <a-box width="0.33" height="0.44" depth="0.10" color="#265b75" rotation="-12 0 0" position="0 0.04 0"></a-box>
+        <a-cylinder radius="0.12" height="0.16" rotation="90 0 0" position="0 -0.22 0.02" color="#d5e4ed"></a-cylinder>
+        <a-cone position="0 -0.32 0.08" rotation="180 0 0" radius-bottom="0.25" radius-top="0" height="0.32" material="color:#46dce8;transparent:true;opacity:0.28;side:double" animation="property: material.opacity; from: 0.12; to: 0.38; dur: 1300; dir: alternate; loop: true"></a-cone>
+        <a-torus radius="0.12" radius-tubular="0.006" color="#60edf0" position="0 -0.34 0.14" animation="property: rotation; to: 0 0 360; dur: 4000; loop: true; easing: linear"></a-torus>
+      </a-entity>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 2" target-events>
+      <a-entity position="0 0 0.12">
+        <a-text value="NEEDLE GUIDANCE" align="center" color="#ffffff" width="1.3" position="0 0.37 0.12"></a-text>
+        <a-box width="0.65" height="0.45" depth="0.24" material="color:#5dacc8;transparent:true;opacity:0.30;side:double"></a-box>
+        <a-sphere radius="0.065" position="-0.03 -0.07 0.10" material="color:#ffaf61;emissive:#a84c13;emissiveIntensity:0.35" animation="property: scale; from: 1 1 1; to: 1.25 1.25 1.25; dur: 850; loop: true; dir: alternate"></a-sphere>
+        <a-cylinder radius="0.008" height="0.45" position="0.15 0.18 0.18" rotation="0 0 -38" color="#f2f9ff" animation="property: position; from: 0.15 0.25 0.18; to: 0.02 0.07 0.18; dur: 2600; loop: true; dir: alternate"></a-cylinder>
+        <a-ring radius-inner="0.09" radius-outer="0.094" position="-0.03 -0.07 0.24" color="#ffcc76"></a-ring>
+      </a-entity>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 3" target-events>
+      <a-entity position="0 0 0.12">
+        <a-text value="REGISTRATION GRAPH" width="1.25" align="center" color="#ffffff" position="0 0.40 0"></a-text>
+        <a-sphere radius="0.09" position="0 0 0.05" color="#61dbe5" animation="property: rotation; to: 0 360 0; dur: 6000; loop: true; easing: linear"></a-sphere>
+        <a-sphere radius="0.065" position="-0.30 0.20 0" color="#e4ad64"></a-sphere>
+        <a-sphere radius="0.065" position="0.30 0.20 0" color="#80e8bb"></a-sphere>
+        <a-sphere radius="0.065" position="-0.30 -0.20 0" color="#8faaff"></a-sphere>
+        <a-sphere radius="0.065" position="0.30 -0.20 0" color="#e09cde"></a-sphere>
+        <a-cylinder radius="0.008" height="0.36" rotation="0 0 -56" position="-0.15 0.10 0.02" color="#bad5df"></a-cylinder>
+        <a-cylinder radius="0.008" height="0.36" rotation="0 0 56" position="0.15 0.10 0.02" color="#bad5df"></a-cylinder>
+        <a-cylinder radius="0.008" height="0.36" rotation="0 0 56" position="-0.15 -0.10 0.02" color="#bad5df"></a-cylinder>
+        <a-cylinder radius="0.008" height="0.36" rotation="0 0 -56" position="0.15 -0.10 0.02" color="#bad5df"></a-cylinder>
+        <a-text value="US" width=".35" align="center" position="-0.30 0.31 .03" color="#fff"></a-text>
+        <a-text value="CT" width=".35" align="center" position="0.30 0.31 .03" color="#fff"></a-text>
+        <a-text value="TF2" width=".35" align="center" position="-0.30 -0.32 .03" color="#fff"></a-text>
+        <a-text value="NAV" width=".35" align="center" position="0.30 -0.32 .03" color="#fff"></a-text>
+      </a-entity>
+    </a-entity>
   </a-scene>
   </div>
   <script>
@@ -89,7 +126,7 @@
     const errorMessage = document.getElementById('error-message');
 
     scene.addEventListener('arReady', () => {
-      status.textContent = 'Point at the example target';
+      status.textContent = 'Scan one of the four target images';
       toggle.disabled = false;
       stop.disabled = false;
     });
