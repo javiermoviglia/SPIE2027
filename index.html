@@ -13,7 +13,7 @@
     .ar-container{position:fixed;inset:0;width:100%;height:100%;overflow:hidden}.ar-container a-scene{width:100%;height:100%}.a-enter-vr-button{display:none!important}
     .hud{position:fixed;inset:0;z-index:9;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom))}
     .top,.bottom{background:rgba(8,24,39,.78);backdrop-filter:blur(14px);border:1px solid rgba(139,213,231,.27);border-radius:16px;padding:12px 15px;max-width:500px;margin:0 auto;width:100%}
-    .eyebrow{color:#74d6e8;text-transform:uppercase;letter-spacing:.13em;font-size:10px;font-weight:700}.title{font-size:15px;font-weight:800;margin:3px 0}.help{font-size:11px;color:#cfdae4;line-height:1.4;margin:4px 0}.bottom{display:flex;gap:8px;align-items:center;justify-content:space-between}.status{font-size:13px;color:#d3dfe9}.dot{display:inline-block;width:9px;height:9px;border-radius:99px;background:#e5b85d;margin-right:7px}.found .dot{background:#52e6a4}.actions{display:flex;gap:7px}.btn{pointer-events:auto;cursor:pointer;border:1px solid #79b9cc;background:#163549;color:#fff;border-radius:9px;padding:9px 12px;font-weight:700;font-size:12px}.btn:disabled{opacity:.4;cursor:not-allowed} .error-panel{display:none;pointer-events:auto;max-width:340px;margin:12px auto 0;padding:12px;border-radius:12px;background:#4e1724;color:white;font-size:13px;text-align:center} .error-panel button{margin-top:8px}
+    .eyebrow{color:#74d6e8;text-transform:uppercase;letter-spacing:.13em;font-size:10px;font-weight:700}.title{font-size:15px;font-weight:800;margin:3px 0}.help{font-size:11px;color:#cfdae4;line-height:1.4;margin:4px 0}.bottom{display:flex;gap:8px;align-items:center;justify-content:space-between}.status{font-size:13px;color:#d3dfe9}.dot{display:inline-block;width:9px;height:9px;border-radius:99px;background:#e5b85d;margin-right:7px}.found .dot{background:#52e6a4}.actions{display:flex;gap:7px}.btn{pointer-events:auto;cursor:pointer;border:1px solid #79b9cc;background:#163549;color:#fff;border-radius:9px;padding:9px 12px;font-weight:700;font-size:12px}.btn:disabled{opacity:.4;cursor:not-allowed} .error-panel{position:fixed;z-index:30;top:45%;left:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;max-width:340px;margin:12px auto 0;padding:12px;border-radius:12px;background:#4e1724;color:white;font-size:13px;text-align:center} .error-panel button{margin-top:8px}
     #welcome{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:linear-gradient(135deg,#081827 0%,#163e59 100%);padding:22px}
     .welcome-card{width:min(100%,440px);border:1px solid #39728c;background:rgba(8,24,39,.8);border-radius:22px;padding:27px;text-align:center;box-shadow:0 24px 60px #0007}.welcome-card h1{font-size:30px;margin:9px 0}.welcome-card p{line-height:1.55;color:#d6e4ed}.primary{border:none;background:#78e4ee;color:#092034;padding:14px 26px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;width:100%;margin-top:14px}.small-link{color:#85dceb;text-decoration:underline;font-size:13px}.hint{font-size:12px;color:#a8becc;margin-top:15px}
     #error{color:#ffc0b3;font-size:13px;display:none;margin-top:12px}.hidden{display:none!important}
@@ -39,8 +39,7 @@
     <div class="bottom" id="bottom"><div class="status"><span class="dot"></span><span id="status">Starting camera…</span></div><div class="actions"><button class="btn" id="toggle" disabled>Hide 3D</button><button class="btn" id="stop" disabled>Reload</button></div></div>
   </div>
   <div class="error-panel" id="error-panel" role="alert"><span id="error-message"></span><br><button class="btn" onclick="location.reload()">Retry camera</button></div>
-  <!-- Target compilado y su imagen pertenecen al ejemplo público oficial de MindAR 1.2.5.
-       Ambos deben corresponder EXACTAMENTE a la misma imagen. -->
+  <!-- Compiled target and printed image must match (MindAR official example). -->
   <div class="ar-container">
   <a-scene
     mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; autoStart: true; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1;"
@@ -49,26 +48,26 @@
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
     <a-entity id="image-target" mindar-image-target="targetIndex: 0" target-events>
       <a-entity id="ar-content">
-        <!-- Plano translúcido flotante, levantado del papel (z positivo). -->
+        <!-- Translucent plane floating above the marker. -->
         <a-plane width="0.90" height="0.66" position="0 0 0.008" material="color:#09273B; opacity:0.32; transparent:true; side:double"></a-plane>
         <a-entity position="0 0 0.05">
-          <!-- Plataforma -->
+          <!-- Platform -->
           <a-cylinder position="0 -0.1 0" radius="0.23" height="0.028" rotation="90 0 0" material="color:#153F5C; metalness:.3; roughness:.3"></a-cylinder>
           <a-torus position="0 -0.1 0.018" radius="0.21" radius-tubular="0.008" material="color:#5ee4f0; emissive:#187b98; emissiveIntensity:.5" animation="property: rotation; to: 0 0 360; dur: 14000; loop: true; easing: linear"></a-torus>
-          <!-- Fantoma / objetivo -->
+          <!-- Phantom / target -->
           <a-box position="0 -0.06 0.09" width="0.25" height="0.20" depth="0.15" material="color:#84d8f0; opacity:.35; transparent:true; side:double"></a-box>
           <a-sphere position="0 -0.04 0.10" radius="0.032" material="color:#ffb969; emissive:#8d3d00; emissiveIntensity:.4" animation="property: scale; from: 1 1 1; to: 1.20 1.20 1.20; dur: 1050; dir: alternate; loop: true"></a-sphere>
-          <!-- Aguja hacia el objetivo -->
+          <!-- Needle towards target -->
           <a-cylinder position="0.09 0.065 0.18" radius="0.008" height="0.31" rotation="-48 0 31" material="color:#ecf7fc; metalness:.8"></a-cylinder>
           <a-cone position="-0.005 -0.015 0.10" radius-bottom="0.012" radius-top="0" height="0.055" rotation="-48 0 31" material="color:#ffba62"></a-cone>
-          <!-- Ejes 3D -->
+          <!-- 3D axes -->
           <a-cylinder position="-.25 -.15 .12" radius="0.003" height="0.19" rotation="0 0 -90" color="#ff6868"></a-cylinder>
           <a-cylinder position="-.345 -.055 .12" radius="0.003" height="0.19" color="#53e48f"></a-cylinder>
           <a-cylinder position="-.345 -.15 .215" radius="0.003" height="0.19" rotation="90 0 0" color="#77a8ff"></a-cylinder>
           <a-text value="X" position="-.14 -.16 .12" width=".22" color="#ff7777" align="center"></a-text>
           <a-text value="Y" position="-.345 .07 .12" width=".22" color="#76ffb2" align="center"></a-text>
           <a-text value="Z" position="-.345 -.15 .34" width=".22" color="#9cbbff" align="center"></a-text>
-          <!-- Mensajes flotantes -->
+          <!-- Floating labels -->
           <a-text value="IMAGE-GUIDED NAVIGATION" position="0 .25 .14" width=".87" align="center" color="#ffffff" font="kelsonsans"></a-text>
           <a-text value="US  /  TRACKING  /  TARGET" position="0 .20 .14" width=".68" align="center" color="#83eef4"></a-text>
           <a-text value="3D TARGET" position="0 -.27 .12" width=".50" align="center" color="#ffce84"></a-text>
