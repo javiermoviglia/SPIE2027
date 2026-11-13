@@ -1,18 +1,19 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#081827" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>SPIE 2027 · WebAR Image Tracking</title>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <style>
     *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#081827;color:white;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
-    a-scene{position:fixed!important;inset:0;z-index:0}
-    .hud{position:fixed;inset:0;z-index:9;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:calc(20px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))}
+    .ar-container{position:fixed;inset:0;width:100%;height:100%;overflow:hidden}.ar-container a-scene{width:100%;height:100%}.a-enter-vr-button{display:none!important}
+    .hud{position:fixed;inset:0;z-index:9;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom))}
     .top,.bottom{background:rgba(8,24,39,.78);backdrop-filter:blur(14px);border:1px solid rgba(139,213,231,.27);border-radius:16px;padding:12px 15px;max-width:500px;margin:0 auto;width:100%}
-    .eyebrow{color:#74d6e8;text-transform:uppercase;letter-spacing:.13em;font-size:10px;font-weight:700}.title{font-size:18px;font-weight:800;margin:3px 0}.help{font-size:13px;color:#cfdae4;line-height:1.4;margin:4px 0}.bottom{display:flex;gap:8px;align-items:center;justify-content:space-between}.status{font-size:13px;color:#d3dfe9}.dot{display:inline-block;width:9px;height:9px;border-radius:99px;background:#e5b85d;margin-right:7px}.found .dot{background:#52e6a4}.actions{display:flex;gap:7px}.btn{pointer-events:auto;cursor:pointer;border:1px solid #79b9cc;background:#163549;color:#fff;border-radius:9px;padding:9px 12px;font-weight:700;font-size:12px}.btn:disabled{opacity:.4;cursor:not-allowed}
+    .eyebrow{color:#74d6e8;text-transform:uppercase;letter-spacing:.13em;font-size:10px;font-weight:700}.title{font-size:15px;font-weight:800;margin:3px 0}.help{font-size:11px;color:#cfdae4;line-height:1.4;margin:4px 0}.bottom{display:flex;gap:8px;align-items:center;justify-content:space-between}.status{font-size:13px;color:#d3dfe9}.dot{display:inline-block;width:9px;height:9px;border-radius:99px;background:#e5b85d;margin-right:7px}.found .dot{background:#52e6a4}.actions{display:flex;gap:7px}.btn{pointer-events:auto;cursor:pointer;border:1px solid #79b9cc;background:#163549;color:#fff;border-radius:9px;padding:9px 12px;font-weight:700;font-size:12px}.btn:disabled{opacity:.4;cursor:not-allowed} .error-panel{display:none;pointer-events:auto;max-width:340px;margin:12px auto 0;padding:12px;border-radius:12px;background:#4e1724;color:white;font-size:13px;text-align:center} .error-panel button{margin-top:8px}
     #welcome{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:linear-gradient(135deg,#081827 0%,#163e59 100%);padding:22px}
     .welcome-card{width:min(100%,440px);border:1px solid #39728c;background:rgba(8,24,39,.8);border-radius:22px;padding:27px;text-align:center;box-shadow:0 24px 60px #0007}.welcome-card h1{font-size:30px;margin:9px 0}.welcome-card p{line-height:1.55;color:#d6e4ed}.primary{border:none;background:#78e4ee;color:#092034;padding:14px 26px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;width:100%;margin-top:14px}.small-link{color:#85dceb;text-decoration:underline;font-size:13px}.hint{font-size:12px;color:#a8becc;margin-top:15px}
     #error{color:#ffc0b3;font-size:13px;display:none;margin-top:12px}.hidden{display:none!important}
@@ -21,11 +22,11 @@
     AFRAME.registerComponent('target-events', {
       init: function () {
         this.el.addEventListener('targetFound', () => {
-          document.querySelector('#status').textContent='Target detectado · AR activa';
+          document.querySelector('#status').textContent='Target detected · AR active';
           document.querySelector('#bottom').classList.add('found');
         });
         this.el.addEventListener('targetLost', () => {
-          document.querySelector('#status').textContent='Apuntá al target de ejemplo';
+          document.querySelector('#status').textContent='Point at the example target';
           document.querySelector('#bottom').classList.remove('found');
         });
       }
@@ -33,25 +34,16 @@
   </script>
 </head>
 <body>
-  <div id="welcome">
-    <div class="welcome-card">
-      <div class="eyebrow">SPIE Medical Imaging · AR demo</div>
-      <h1>Image Tracking WebAR</h1>
-      <p>Apuntá la cámara al <strong>target de ejemplo</strong> y aparecerá un modelo 3D animado de navegación médica sobre la imagen.</p>
-      <p><a class="small-link" href="target.html" target="_blank" rel="noopener">Ver imagen target (abrila en otra pantalla)</a></p>
-      <button class="primary" id="start">Abrir cámara e iniciar AR</button>
-      <p class="hint">Usá Safari en iPhone o Chrome en Android. Se requiere HTTPS y permiso de cámara.</p>
-      <p id="error" role="alert"></p>
-    </div>
-  </div>
   <div class="hud" id="hud">
-    <div class="top"><div class="eyebrow">SPIE 2027 · Prototype</div><div class="title">Graph-Based Surgical Navigation</div><div class="help">Buscá la imagen azul y amarilla de MindAR. La escena queda anclada a ella.</div></div>
-    <div class="bottom" id="bottom"><div class="status"><span class="dot"></span><span id="status">Iniciando cámara…</span></div><div class="actions"><button class="btn" id="toggle" disabled>Ocultar 3D</button><button class="btn" id="stop" disabled>Cerrar</button></div></div>
+    <div class="top"><div class="eyebrow">SPIE 2027 · Prototype</div><div class="title">Graph-Based Surgical Navigation</div><div class="help">Point your camera at the MindAR example image. The 3D scene is anchored to it.</div></div>
+    <div class="bottom" id="bottom"><div class="status"><span class="dot"></span><span id="status">Starting camera…</span></div><div class="actions"><button class="btn" id="toggle" disabled>Hide 3D</button><button class="btn" id="stop" disabled>Reload</button></div></div>
   </div>
+  <div class="error-panel" id="error-panel" role="alert"><span id="error-message"></span><br><button class="btn" onclick="location.reload()">Retry camera</button></div>
   <!-- Target compilado y su imagen pertenecen al ejemplo público oficial de MindAR 1.2.5.
        Ambos deben corresponder EXACTAMENTE a la misma imagen. -->
+  <div class="ar-container">
   <a-scene
-    mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1;"
+    mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; autoStart: true; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1;"
     embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights: true; alpha: true;"
     vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -85,37 +77,33 @@
       </a-entity>
     </a-entity>
   </a-scene>
+  </div>
   <script>
+    // MindAR starts automatically as soon as the scene is ready.
+    // The browser itself asks the visitor to grant camera permission.
     const scene = document.querySelector('a-scene');
-    const welcome = document.getElementById('welcome');
-    const start = document.getElementById('start');
-    const stop = document.getElementById('stop');
     const toggle = document.getElementById('toggle');
+    const stop = document.getElementById('stop');
     const status = document.getElementById('status');
-    const error = document.getElementById('error');
     const content = document.getElementById('ar-content');
-    const waitScene = () => new Promise(resolve => scene.hasLoaded ? resolve() : scene.addEventListener('loaded', resolve, {once:true}));
-    start.addEventListener('click', async () => {
-      start.disabled = true; start.textContent = 'Iniciando…'; error.style.display='none';
-      try {
-        await waitScene();
-        await scene.systems['mindar-image-system'].start();
-        welcome.classList.add('hidden'); stop.disabled=false; toggle.disabled=false;
-        status.textContent='Apuntá al target de ejemplo';
-      } catch(e) {
-        error.style.display='block'; error.textContent='No se pudo iniciar la cámara. Revisá HTTPS, permisos y navegador. Detalle: '+(e?.message||e);
-        start.disabled=false; start.textContent='Reintentar cámara';
-      }
+    const errorPanel = document.getElementById('error-panel');
+    const errorMessage = document.getElementById('error-message');
+
+    scene.addEventListener('arReady', () => {
+      status.textContent = 'Point at the example target';
+      toggle.disabled = false;
+      stop.disabled = false;
     });
-    stop.addEventListener('click', () => {
-      scene.systems['mindar-image-system'].stop();
-      stop.disabled=true;toggle.disabled=true;welcome.classList.remove('hidden');
-      start.disabled=false;start.textContent='Abrir cámara e iniciar AR';
+    scene.addEventListener('arError', (e) => {
+      status.textContent = 'Camera unavailable';
+      errorMessage.textContent = 'Unable to start the camera. Check browser permissions and reload the page.';
+      errorPanel.style.display = 'block';
     });
     toggle.addEventListener('click', () => {
       content.object3D.visible = !content.object3D.visible;
-      toggle.textContent=content.object3D.visible?'Ocultar 3D':'Mostrar 3D';
+      toggle.textContent = content.object3D.visible ? 'Hide 3D' : 'Show 3D';
     });
+    stop.addEventListener('click', () => location.reload());
   </script>
 </body>
 </html>
