@@ -1,110 +1,121 @@
 <!doctype html>
-<html lang="en"><head>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#081c2b">
-<meta name="description" content="SPIE Medical Imaging: interactive 3D and markerless AR navigation setup">
-<title>SPIE 2027 | One workflow, two trackers</title>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.0/dist/model-viewer.min.js"></script>
+<meta name="theme-color" content="#0b2132">
+<title>SPIE 2027 · Explore the Setup</title>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.4.0/model-viewer.min.js"></script>
 <style>
-:root{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#e5f2f9;background:#081c2b}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow-x:hidden}
-body{background:radial-gradient(ellipse at 50% -15%,#205373 0%,#102e42 35%,#081827 82%);min-height:100dvh}
-main{width:min(100%,1000px);margin:auto;min-height:100dvh;padding:clamp(15px,3vw,34px);display:flex;flex-direction:column;gap:15px}
-header{display:flex;justify-content:space-between;align-items:start;gap:16px}
-.eyebrow{font-size:11px;letter-spacing:.16em;color:#84e2e9;font-weight:800}
-h1{font-size:clamp(25px,5vw,41px);letter-spacing:-.045em;line-height:1.07;margin:9px 0}
-.subtitle{font-size:clamp(12px,2.8vw,15px);color:#b2cbd8;line-height:1.5;margin:0}
-.logo{border:1px solid #467a94;border-radius:9px;padding:9px 12px;font-size:11px;font-weight:800;white-space:nowrap;color:#d4eefa}
-.stage{position:relative;min-height:51dvh;height:min(61dvh,680px);flex:1;background:radial-gradient(ellipse at 50% 40%,#355975,#193a51 55%,#0b2639 100%);border:1px solid #517c96;border-radius:22px;overflow:hidden;box-shadow:0 24px 55px #0007}
-model-viewer{display:block;width:100%;height:100%;--progress-bar-color:#75e9f3;--poster-color:transparent}
-.tag{position:absolute;left:16px;top:15px;padding:7px 10px;border-radius:8px;font-weight:800;font-size:10px;letter-spacing:.09em;color:#abf4f4;background:#0a273bcf;pointer-events:none}
-.hint{position:absolute;bottom:14px;left:15px;max-width:58%;font-size:11px;color:#d1e7f0;padding:8px 11px;border-radius:8px;background:#0c2a3dd9;pointer-events:none}
-.ar-button{position:absolute;bottom:15px;right:15px;border:0;border-radius:12px;color:#063040;background:#80e6ec;padding:13px 17px;font-size:14px;font-weight:850;box-shadow:0 9px 26px #0007;cursor:pointer}
-.ar-button:focus-visible,.choice:focus-visible{outline:3px solid #fff;outline-offset:3px}
-.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.choice{background:#18384e;color:#edf7ff;text-align:left;border:1px solid #568298;border-radius:14px;padding:14px 16px;cursor:pointer}
-.choice.active{background:linear-gradient(115deg,#086078,#12485c);border:2px solid #79e5eb}
-.choice strong{display:block;font-size:15px}
-.choice small{display:block;font-size:11px;color:#c0d7e4;margin-top:5px}
-.note{display:flex;align-items:start;gap:12px;background:#0f2a3c;border:1px solid #365e72;border-radius:12px;padding:14px 16px}
-.note .symbol{font-size:21px;color:#79e6e9}
-.note strong{font-size:13px}
-.note p{font-size:12px;color:#bcd3e0;margin:6px 0 0;line-height:1.55}
-.status{position:absolute;top:53px;left:16px;font-size:11px;color:#f0faff;background:#0b3145e6;padding:6px 10px;border-radius:7px}
-.status:empty{display:none}
-footer{font-size:11px;color:#9ebaca;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}a{color:#8edce9}
-@media(max-width:560px){main{gap:12px;padding:14px}.logo{display:none}.stage{height:53dvh;min-height:47dvh}.choice{padding:12px}.choice strong{font-size:13px}.choice small{font-size:10px}.ar-button{padding:11px 13px;font-size:12px}.hint{font-size:10px}}
-</style></head><body><main>
-<header>
- <div><div class="eyebrow">SPIE MEDICAL IMAGING 2027 · INTERACTIVE DEMO</div>
- <h1>One workflow.<br>Two tracking systems.</h1>
- <p class="subtitle">Explore a modular image-guided intervention setup in 3D.<br>No image target or poster recognition required.</p></div>
- <div class="logo">MIISM · HEIDELBERG</div>
-</header>
-<section class="stage" aria-label="Three-dimensional navigation setup">
- <model-viewer id="viewer"
-   src="./models/ndi-polaris.glb"
-   alt="Illustrative setup with stereo-optical Polaris tracker, phantom, ultrasound probe, needle, projector and registration workstation"
-   camera-controls
-   camera-orbit="35deg 68deg 3.7m"
-   camera-target="0m 0.9m 0m"
-   field-of-view="32deg"
-   min-camera-orbit="auto 20deg 1.1m"
-   max-camera-orbit="auto 90deg 7m"
-   interaction-prompt="auto"
-   shadow-intensity=".9"
-   shadow-softness=".9"
-   environment-image="neutral"
-   exposure="1.15"
-   loading="eager"
-   ar
-   ar-modes="scene-viewer webxr quick-look"
-   ar-placement="floor"
-   ar-scale="auto">
-  <button slot="ar-button" class="ar-button" aria-label="Place the selected model in your room">▣ View in AR</button>
- </model-viewer>
- <div class="tag">3D SETUP · SCHEMATIC</div>
- <div class="hint">Drag to rotate · Pinch to zoom · Move closer in AR</div>
- <div class="status" id="status" role="status" aria-live="polite"></div>
-</section>
-<section class="buttons" aria-label="Select the optical tracking system">
- <button type="button" id="ndi" class="choice active" aria-pressed="true"><strong>NDI Polaris</strong><small>Stereo-optical tracker</small></button>
- <button type="button" id="nir" class="choice" aria-pressed="false"><strong>Monocular NIR</strong><small>NIR camera + ArUco fiducial</small></button>
-</section>
-<aside class="note"><span class="symbol">◎</span><div><strong>Place the setup in your space</strong>
-<p>Select a tracker, then tap <b>View in AR</b>. Move the phone slowly to detect a table or floor, place the setup, and walk around it or approach the phantom. The ultrasound probe, needle, phantom, projector and navigation workflow remain the same.</p></div></aside>
-<footer><span>Scientific illustration · Not a clinical navigation display</span><span><a href="https://github.com/javiermoviglia/SPIE2027/tree/mindAR">Previous MindAR version</a> · <a href="https://github.com/javiermoviglia/SPIE2027">GitHub</a></span></footer>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;height:100%;overflow:hidden}
+body{background:#091d2b;color:#eef9ff;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+main{height:100%;height:100dvh;display:flex;flex-direction:column;padding:12px;gap:10px;max-width:900px;margin:auto}
+h1{margin:0;text-align:center;font-size:clamp(19px,4.3vw,25px);line-height:1.25;letter-spacing:-.025em}
+.stage{position:relative;min-height:0;flex:1;border-radius:15px;background:radial-gradient(ellipse,#426077 0%,#1a3a50 60%,#0e2535 100%);overflow:hidden;border:1px solid #47697c}
+model-viewer{width:100%;height:100%;display:block;--progress-bar-color:#6de7e9;--poster-color:transparent}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+button{font-family:inherit;cursor:pointer}
+.mode{min-height:50px;border-radius:11px;border:1px solid #64899a;background:#183e55;color:white;font-size:14px;font-weight:750;padding:9px 4px}
+.mode[aria-pressed="true"]{background:#096d83;border:2px solid #92f5f5}
+#ar-button{width:100%;border-radius:12px;border:0;background:#78ebed;color:#062b3e;font-size:17px;font-weight:900;padding:15px 10px}
+#ar-button:focus-visible,.mode:focus-visible{outline:3px solid white;outline-offset:2px}
+#message{font-size:12px;color:#c8e1e9;text-align:center;min-height:18px;line-height:1.4}
+#message.error{color:#ffcfad}
+#loading{position:absolute;inset:0;display:grid;place-items:center;color:#d7e8f0;font-size:14px;background:#12314680;pointer-events:none;transition:opacity .2s}
+#loading.hide{opacity:0;visibility:hidden}
+#hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);white-space:nowrap;color:#e7f8ff;background:#102e42bf;padding:7px 11px;border-radius:8px;font-size:11px;pointer-events:none}
+@media(max-height:520px){main{gap:6px;padding:8px}h1{font-size:17px}.mode{min-height:42px}#ar-button{padding:10px}}
+</style>
+</head>
+<body>
+<main>
+ <h1>One Workflow · Two Trackers</h1>
+ <div class="stage">
+  <model-viewer id="model"
+    src="./models/ndi-polaris.glb"
+    alt="3D image-guided navigation setup with phantom, ultrasound probe, needle, projector and NDI Polaris tracker"
+    camera-controls
+    auto-rotate
+    auto-rotate-delay="2000"
+    rotation-per-second="12deg"
+    touch-action="pan-y"
+    camera-orbit="35deg 66deg 4m"
+    camera-target="auto auto auto"
+    field-of-view="34deg"
+    shadow-intensity="0.65"
+    exposure="1.4"
+    environment-image="neutral"
+    ar
+    ar-placement="floor"
+    ar-scale="auto"
+    ar-modes="scene-viewer webxr quick-look"
+    loading="eager"
+    reveal="auto"></model-viewer>
+  <div id="loading">Loading 3D setup…</div>
+  <div id="hint">Drag to rotate · Pinch to zoom</div>
+ </div>
+ <div class="controls">
+  <button id="ndi" class="mode" aria-pressed="true">NDI Polaris</button>
+  <button id="nir" class="mode" aria-pressed="false">Monocular NIR</button>
+ </div>
+ <button id="ar-button">View in AR</button>
+ <div id="message" aria-live="polite">Choose a tracker, then place the setup in your space.</div>
 </main>
 <script>
-(() => {
- const viewer=document.getElementById('viewer');
- const choices={ndi:document.getElementById('ndi'),nir:document.getElementById('nir')};
- const status=document.getElementById('status');
- const variants={
-   ndi:{src:'./models/ndi-polaris.glb',name:'NDI Polaris',alt:'Schematic navigation setup with the NDI Polaris stereo-optical tracking system'},
-   nir:{src:'./models/monocular-nir.glb',name:'Monocular NIR',alt:'Schematic navigation setup with monocular NIR tracking camera and ArUco fiducial'}
+(()=>{
+ const viewer=document.getElementById('model');
+ const ar=document.getElementById('ar-button');
+ const message=document.getElementById('message');
+ const loading=document.getElementById('loading');
+ const ndi=document.getElementById('ndi'),nir=document.getElementById('nir');
+ const models={
+   ndi:{url:'./models/ndi-polaris.glb',alt:'Setup with NDI Polaris stereo optical tracker'},
+   nir:{url:'./models/monocular-nir.glb',alt:'Setup with monocular near-infrared camera and ArUco marker'}
  };
- let current='ndi';
- function select(key) {
-   if(key===current||!variants[key])return;
-   current=key;
-   viewer.src=variants[key].src;
-   viewer.alt=variants[key].alt;
-   for(const name of Object.keys(choices)){
-     const selected=name===key;
-     choices[name].classList.toggle('active',selected);
-     choices[name].setAttribute('aria-pressed',String(selected));
-   }
-   status.textContent='Loading '+variants[key].name+'…';
+ let chosen='ndi',loaded=false,failed=false;
+ function show(text,error=false){message.textContent=text;message.classList.toggle('error',error)}
+ function pick(key){
+   if(key===chosen)return;
+   chosen=key;loaded=false;failed=false;
+   loading.classList.remove('hide');
+   ndi.setAttribute('aria-pressed',String(key==='ndi'));
+   nir.setAttribute('aria-pressed',String(key==='nir'));
+   viewer.setAttribute('src',models[key].url);
+   viewer.setAttribute('alt',models[key].alt);
+   show('Loading 3D setup…');
  }
- choices.ndi.addEventListener('click',()=>select('ndi'));
- choices.nir.addEventListener('click',()=>select('nir'));
- viewer.addEventListener('load',()=>{status.textContent='';});
- viewer.addEventListener('error',e=>{status.textContent='Model could not be loaded. Please refresh.';console.error(e);});
- viewer.addEventListener('ar-status',e=>{
-   if(e.detail.status==='failed')status.textContent='AR is unavailable on this phone. You can still explore the model in 3D.';
+ ndi.addEventListener('click',()=>pick('ndi'));
+ nir.addEventListener('click',()=>pick('nir'));
+ viewer.addEventListener('load',()=>{
+   loaded=true;failed=false;
+   loading.classList.add('hide');
+   show('Move the phone around the model in AR.');
  });
- // On iPhone Quick Look and Android Scene Viewer, users must switch trackers BEFORE entering native AR.
+ viewer.addEventListener('error',(event)=>{
+   loaded=false;failed=true;
+   loading.classList.remove('hide');
+   loading.textContent='Could not load the 3D model';
+   show('3D loading failed. Refresh the page or try another browser.',true);
+   console.error('model-viewer load error',event);
+ });
+ ar.addEventListener('click',()=>{
+   if(!window.customElements.get('model-viewer')){
+     show('3D viewer unavailable. Check your connection and reload.',true);return;
+   }
+   if(!loaded){show(failed?'3D model failed to load. Reload the page.':'Please wait until the 3D model loads.',true);return;}
+   if(!viewer.canActivateAR){show('This phone/browser does not support AR. You can still explore the 3D model.',true);return;}
+   try{
+     const result=viewer.activateAR();
+     if(result&&typeof result.catch==='function')result.catch(error=>{show('Unable to open AR on this device.',true);console.error(error);});
+   }catch(error){show('Unable to open AR on this device.',true);console.error(error);}
+ });
+ viewer.addEventListener('ar-status',event=>{
+   if(event.detail.status==='failed')show('AR could not start. Try Safari on iPhone or Chrome on Android.',true);
+ });
+ setTimeout(()=>{
+   if(!window.customElements.get('model-viewer')){loading.textContent='3D viewer did not start';show('The 3D viewer could not load. Check connection or refresh.',true);}
+   else if(!loaded&&!failed)show('Still loading 3D… Check the network and refresh if needed.');
+ },14000);
 })();
-</script></body></html>
+</script>
+</body></html>
