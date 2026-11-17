@@ -17,7 +17,7 @@ model-viewer{width:100%;height:100%;display:block;--progress-bar-color:#6de7e9;-
 button{font-family:inherit;cursor:pointer}
 .mode{min-height:50px;border-radius:11px;border:1px solid #64899a;background:#183e55;color:white;font-size:14px;font-weight:750;padding:9px 4px}
 .mode[aria-pressed="true"]{background:#096d83;border:2px solid #92f5f5}
-#ar-button{width:100%;border-radius:12px;border:0;background:#78ebed;color:#062b3e;font-size:17px;font-weight:900;padding:15px 10px}
+#ar-button{position:absolute;right:14px;bottom:14px;border-radius:12px;border:0;background:#78ebed;color:#062b3e;font-size:16px;font-weight:900;padding:14px 18px;box-shadow:0 7px 24px #0007;z-index:4}
 #ar-button:focus-visible,.mode:focus-visible{outline:3px solid white;outline-offset:2px}
 #message{font-size:12px;color:#c8e1e9;text-align:center;min-height:18px;line-height:1.4}
 #message.error{color:#ffcfad}
@@ -48,9 +48,11 @@ button{font-family:inherit;cursor:pointer}
     ar
     ar-placement="floor"
     ar-scale="auto"
-    ar-modes="scene-viewer webxr quick-look"
+    ar-modes="webxr scene-viewer quick-look"
     loading="eager"
-    reveal="auto"></model-viewer>
+    reveal="auto">
+    <button slot="ar-button" id="ar-button" type="button">View in AR</button>
+  </model-viewer>
   <div id="loading">Loading 3D setup…</div>
   <div id="hint">Drag to rotate · Pinch to zoom</div>
  </div>
@@ -58,15 +60,15 @@ button{font-family:inherit;cursor:pointer}
   <button id="ndi" class="mode" aria-pressed="true">NDI Polaris</button>
   <button id="nir" class="mode" aria-pressed="false">Monocular NIR</button>
  </div>
- <button id="ar-button">View in AR</button>
  <div id="message" aria-live="polite">Choose a tracker, then place the setup in your space.</div>
 </main>
 <script>
 (()=>{
  const viewer=document.getElementById('model');
- const ar=document.getElementById('ar-button');
+ 
  const message=document.getElementById('message');
  const loading=document.getElementById('loading');
+ const ar=document.getElementById('ar-button');
  const ndi=document.getElementById('ndi'),nir=document.getElementById('nir');
  const models={
    ndi:{url:'./models/ndi-polaris.glb',alt:'Setup with NDI Polaris stereo optical tracker'},
@@ -89,7 +91,7 @@ button{font-family:inherit;cursor:pointer}
  viewer.addEventListener('load',()=>{
    loaded=true;failed=false;
    loading.classList.add('hide');
-   show('Move the phone around the model in AR.');
+   show(viewer.canActivateAR ? 'Tap View in AR to place the setup.' : 'To use AR, open in Safari (iPhone) or Chrome (Android).');
  });
  viewer.addEventListener('error',(event)=>{
    loaded=false;failed=true;
@@ -98,19 +100,13 @@ button{font-family:inherit;cursor:pointer}
    show('3D loading failed. Refresh the page or try another browser.',true);
    console.error('model-viewer load error',event);
  });
- ar.addEventListener('click',()=>{
-   if(!window.customElements.get('model-viewer')){
-     show('3D viewer unavailable. Check your connection and reload.',true);return;
-   }
-   if(!loaded){show(failed?'3D model failed to load. Reload the page.':'Please wait until the 3D model loads.',true);return;}
-   if(!viewer.canActivateAR){show('This phone/browser does not support AR. You can still explore the 3D model.',true);return;}
-   try{
-     const result=viewer.activateAR();
-     if(result&&typeof result.catch==='function')result.catch(error=>{show('Unable to open AR on this device.',true);console.error(error);});
-   }catch(error){show('Unable to open AR on this device.',true);console.error(error);}
- });
  viewer.addEventListener('ar-status',event=>{
-   if(event.detail.status==='failed')show('AR could not start. Try Safari on iPhone or Chrome on Android.',true);
+   if(event.detail.status==='failed')show('AR did not launch. Open this link directly in Safari (iPhone) or Chrome (Android), not an in-app browser.',true);
+   if(event.detail.status==='session-started')show('AR is active. Move your phone to explore.');
+ });
+ ar.addEventListener('click',()=>{
+   if(!viewer.canActivateAR)show('AR not available in this browser. Open the page directly in Safari on iPhone or Chrome on Android.',true);
+   else if(!loaded)show('Please wait for the model to load.',true);
  });
  setTimeout(()=>{
    if(!window.customElements.get('model-viewer')){loading.textContent='3D viewer did not start';show('The 3D viewer could not load. Check connection or refresh.',true);}
