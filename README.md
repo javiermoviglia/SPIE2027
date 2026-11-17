@@ -1,21 +1,30 @@
-# SPIE 2027 — WebAR multi-target demo
+# SPIE 2027: One workflow, two trackers
 
-Four different sample target images activate four different A-Frame 3D scenes.
+Single-image-target WebAR demonstration of the modular registration platform.
 
-- Camera: https://javiermoviglia.github.io/SPIE2027/
-- Print or display the four sample images: https://javiermoviglia.github.io/SPIE2027/target.html
+**Fig. 1** (the graph-based platform image) is the only image target. Two phone buttons alternate **NDI Polaris** and **Monocular NIR / ArUco**. Each view places a conceptual software-graph screen next to a simplified setup: gelatin phantom, tracked ultrasound probe, needle, projector guidance and the selected optical tracker.
 
-## Four scenes
-- Index 0: navigation platform and needle.
-- Index 1: ultrasound transducer and animated scan.
-- Index 2: needle guidance and phantom.
-- Index 3: animated registration graph.
+The tracker and marker type change; the ultrasound-guided navigation workflow remains the same.
 
-Open the image target page on a computer and the camera page on a phone. Allow camera access, point at one image, and change to another. Tracking is limited to one image at a time for improved performance.
+These are illustrative conceptual graphics, not actual software screenshots or CAD models. This is an explanation of workflow reconfiguration rather than accuracy measurement.
 
-## Data source / future replacement
-For this immediate demonstration, the compiled target bundle is loaded from the public GitHub project https://github.com/lertsoft/temporarily_closed ; images for target indices 0–3 also come from that project. The published bundle actually contains ten image targets, but this app displays content only for the first four. This external test dataset is temporary and is not part of the SPIE research. Confirm licensing before redistributing or using it publicly.
+## Required target files
 
-To use your own four SPIE images: compile all four in order using https://hiukim.github.io/mind-ar-js-doc/tools/compile/ , upload the resulting targets.mind into the repository root, change the imageTargetSrc property in index.html to ./targets.mind, and replace the images in target.html in the same order.
+The web code is included, but camera-based recognition needs two binary assets added to the repository:
 
-Implementation: MindAR 1.2.5 + A-Frame 1.5.0, HTML/JS, GitHub Pages. Actual phone-camera tests are recommended.
+1. Upload the user's exact Fig. 1 image as **fig1.jpg** to the repository root.
+2. Open https://hiukim.github.io/mind-ar-js-doc/tools/compile/ and compile only this image.
+3. Download the file, rename it **fig1.mind**, and upload it to the repository root.
+4. Merge the feature branch to main; open https://javiermoviglia.github.io/SPIE2027/ on an HTTPS-enabled phone and scan Fig. 1.
+
+Do not compile the entire poster or substitute a different crop. Print matte and large enough for stable tracking.
+
+## Test and preview
+
+- AR page: https://javiermoviglia.github.io/SPIE2027/
+- Fig. 1 instructions: https://javiermoviglia.github.io/SPIE2027/target.html
+- **2D-only preview:** https://javiermoviglia.github.io/SPIE2027/?preview=1
+- One image target, index 0. No external example targets.
+- Test camera recognition, both switch buttons, reacquisition, iOS Safari and Android Chrome before the conference.
+
+Stack: A-Frame 1.5.0 and MindAR 1.2.5.

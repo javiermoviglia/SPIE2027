@@ -1,121 +1,244 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#081827" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>SPIE 2027 · WebAR Image Tracking</title>
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-  <style>
-    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#081827;color:white;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
-    .ar-container{position:fixed;inset:0;width:100%;height:100%;overflow:hidden}.ar-container a-scene{width:100%;height:100%}.a-enter-vr-button{display:none!important}
-    .hud{position:fixed;inset:0;z-index:9;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom))}
-    .top,.bottom{background:rgba(8,24,39,.78);backdrop-filter:blur(14px);border:1px solid rgba(139,213,231,.27);border-radius:16px;padding:12px 15px;max-width:500px;margin:0 auto;width:100%}
-    .eyebrow{color:#74d6e8;text-transform:uppercase;letter-spacing:.13em;font-size:10px;font-weight:700}.title{font-size:15px;font-weight:800;margin:3px 0}.help{font-size:11px;color:#cfdae4;line-height:1.4;margin:4px 0}.bottom{display:flex;gap:8px;align-items:center;justify-content:space-between}.status{font-size:13px;color:#d3dfe9}.dot{display:inline-block;width:9px;height:9px;border-radius:99px;background:#e5b85d;margin-right:7px}.found .dot{background:#52e6a4}.actions{display:flex;gap:7px}.btn{pointer-events:auto;cursor:pointer;border:1px solid #79b9cc;background:#163549;color:#fff;border-radius:9px;padding:9px 12px;font-weight:700;font-size:12px}.btn:disabled{opacity:.4;cursor:not-allowed} .error-panel{position:fixed;z-index:30;top:45%;left:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;max-width:340px;margin:12px auto 0;padding:12px;border-radius:12px;background:#4e1724;color:white;font-size:13px;text-align:center} .error-panel button{margin-top:8px}
-    #welcome{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:linear-gradient(135deg,#081827 0%,#163e59 100%);padding:22px}
-    .welcome-card{width:min(100%,440px);border:1px solid #39728c;background:rgba(8,24,39,.8);border-radius:22px;padding:27px;text-align:center;box-shadow:0 24px 60px #0007}.welcome-card h1{font-size:30px;margin:9px 0}.welcome-card p{line-height:1.55;color:#d6e4ed}.primary{border:none;background:#78e4ee;color:#092034;padding:14px 26px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;width:100%;margin-top:14px}.small-link{color:#85dceb;text-decoration:underline;font-size:13px}.hint{font-size:12px;color:#a8becc;margin-top:15px}
-    #error{color:#ffc0b3;font-size:13px;display:none;margin-top:12px}.hidden{display:none!important}
-  </style>
-  <script>
-    AFRAME.registerComponent('target-events', {
-      init: function () {
-        this.el.addEventListener('targetFound', () => {
-          document.querySelector('#status').textContent='Target detected · AR active';
-          document.querySelector('#bottom').classList.add('found');
-        });
-        this.el.addEventListener('targetLost', () => {
-          document.querySelector('#status').textContent='Scan one of the two target images';
-          document.querySelector('#bottom').classList.remove('found');
-        });
-      }
-    });
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071625">
+<title>SPIE 2027 · One workflow, two tracking systems</title>
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+<style>
+:root{--blue:#4dd2f2;--accent:#f7b358;--bg:#071625;--glass:rgba(9,27,44,.91)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);font-family:Inter,system-ui,Arial,sans-serif;color:#fff}
+a-scene{position:absolute!important;inset:0;width:100%;height:100%;z-index:0}
+.a-enter-vr-button,.a-enter-ar-button{display:none!important}
+.hud{pointer-events:none;position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 12px calc(10px + env(safe-area-inset-bottom));gap:10px}
+.head,.controls{width:min(100%,520px);margin:0 auto;background:var(--glass);border:1px solid #3b627d;border-radius:16px;padding:12px 15px;box-shadow:0 8px 35px #0007;backdrop-filter:blur(10px)}
+.eyebrow{font-size:10px;letter-spacing:.13em;color:var(--blue);font-weight:800}
+h1{margin:4px 0 2px;font-size:17px;line-height:1.25}
+.sub{color:#c2d7e6;font-size:12px;margin:0}
+.controls{pointer-events:auto}
+.switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+button{font:700 13px system-ui;cursor:pointer}
+.choice{border:1px solid #6b889b;padding:12px 9px;border-radius:11px;background:#17374c;color:#eff8ff}
+.choice[aria-pressed="true"]{border:2px solid var(--blue);background:#095c72;box-shadow:inset 0 0 0 1px #8cf6ff}
+.status-line{display:flex;gap:8px;justify-content:space-between;align-items:center;font-size:12px;color:#c5dbe7;line-height:1.35}
+.dot{flex:0 0 9px;width:9px;height:9px;border-radius:100%;background:#f3b457;display:inline-block;margin-right:6px}
+.tracked .dot{background:#65f1a1}
+.small{font-size:11px;color:#b5cedc}
+.link{pointer-events:auto;color:#8de9fa;text-decoration:underline}
+#intro{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:linear-gradient(150deg,#071625,#103a58);padding:20px}
+#intro.hide{display:none}
+.welcome{width:min(440px,100%);background:#0c263c;border:1px solid #326484;border-radius:21px;padding:25px;text-align:center;box-shadow:0 20px 80px #0008}
+.welcome h2{font-size:28px;margin:6px 0 10px}
+.welcome p{color:#d1e2ec;line-height:1.5;font-size:14px}
+.primary{border:0;border-radius:11px;padding:14px 18px;width:100%;background:#71e2f3;color:#062535;font-size:16px}
+.warning{margin:12px 0 0;font-size:12px;color:#ffcca8}
+#debug{position:fixed;inset:0;z-index:30;display:none;place-items:center;background:#061622ed;padding:25px}
+#debug .welcome{max-width:420px}
+#preview{position:fixed;inset:0;z-index:1;display:none;align-items:center;justify-content:center;padding:120px 12px 145px;pointer-events:none}
+#preview .card{width:min(100%,460px);background:#f5faff;color:#102b3b;border-radius:14px;padding:12px;box-shadow:0 14px 35px #0007;border:2px solid #72d9ec}
+#preview .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#preview .panel{min-height:170px;background:white;border:1px solid #ccdce5;border-radius:9px;padding:10px}
+#preview h3{font-size:13px;color:#0a527b;margin:0 0 8px}
+#preview .line{padding:5px;border-radius:5px;background:#eaf2f8;margin-bottom:6px;font-size:11px}
+#preview .step{font-size:11px;color:#284a5a;margin:4px 0}
+#preview .unchanged{background:#e1f5e7;border-radius:7px;padding:8px;color:#195633;font-size:11px;margin-top:10px;font-weight:700}
+@media(max-height:600px){.head,.controls{padding:8px 12px}.choice{padding:8px 4px}#preview{padding-top:90px;padding-bottom:95px}}
+</style>
 </head>
 <body>
-  <div class="hud" id="hud">
-    <div class="top"><div class="eyebrow">SPIE 2027 · Prototype</div><div class="title">Graph-Based Surgical Navigation</div><div class="help">Scan any of the <a href="target.html" target="_blank" style="color:#81dce5;pointer-events:auto">two verified example images</a> to view its 3D scene.</div></div>
-    <div class="bottom" id="bottom"><div class="status"><span class="dot"></span><span id="status">Starting camera…</span></div><div class="actions"><button class="btn" id="toggle" disabled>Hide 3D</button><button class="btn" id="stop" disabled>Reload</button></div></div>
+<div id="intro">
+ <div class="welcome">
+  <div class="eyebrow">SPIE MEDICAL IMAGING 2027 · WEBAR</div>
+  <h2>One workflow.<br>Two trackers.</h2>
+  <p>Point your phone at <strong>Fig. 1</strong>, the graph-based platform figure in the poster. Switch trackers to explore the unchanged navigation setup.</p>
+  <button id="start" class="primary">Start camera</button>
+  <div class="warning" id="preflight">Requires a compiled Fig. 1 target file (<code>fig1.mind</code>).</div>
+  <p><a class="link" href="target.html">View target image / setup instructions</a></p>
+ </div>
+</div>
+<div class="hud">
+ <header class="head">
+  <div class="eyebrow">MODULAR REGISTRATION PLATFORM</div>
+  <h1>Reconfigure the tracker — keep the workflow</h1>
+  <p class="sub">Virtual comparison · scientific demonstration</p>
+ </header>
+ <footer class="controls">
+  <div class="switch" role="group" aria-label="Choose tracking system">
+   <button class="choice" id="polaris" aria-pressed="true">NDI Polaris</button>
+   <button class="choice" id="monocular" aria-pressed="false">Monocular NIR</button>
   </div>
-  <div class="error-panel" id="error-panel" role="alert"><span id="error-message"></span><br><button class="btn" onclick="location.reload()">Retry camera</button></div>
-  <!-- Compiled target and printed image must match (MindAR official example). -->
-  <div class="ar-container">
-  <a-scene
-    mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/band-example/band.mind; autoStart: true; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1; filterMinCF: 0.001; filterBeta: 0.05; warmupTolerance: 5; missTolerance: 8;"
-    embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights: true; alpha: true;"
-    vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-    <a-entity id="image-target" mindar-image-target="targetIndex: 0" target-events>
-      <a-entity id="ar-content">
-        <!-- Translucent plane floating above the marker. -->
-        <a-plane width="0.90" height="0.66" position="0 0 0.008" material="color:#09273B; opacity:0.32; transparent:true; side:double"></a-plane>
-        <a-entity position="0 0 0.05">
-          <!-- Platform -->
-          <a-cylinder position="0 -0.1 0" radius="0.23" height="0.028" rotation="90 0 0" material="color:#153F5C; metalness:.3; roughness:.3"></a-cylinder>
-          <a-torus position="0 -0.1 0.018" radius="0.21" radius-tubular="0.008" material="color:#5ee4f0; emissive:#187b98; emissiveIntensity:.5" animation="property: rotation; to: 0 0 360; dur: 14000; loop: true; easing: linear"></a-torus>
-          <!-- Phantom / target -->
-          <a-box position="0 -0.06 0.09" width="0.25" height="0.20" depth="0.15" material="color:#84d8f0; opacity:.35; transparent:true; side:double"></a-box>
-          <a-sphere position="0 -0.04 0.10" radius="0.032" material="color:#ffb969; emissive:#8d3d00; emissiveIntensity:.4" animation="property: scale; from: 1 1 1; to: 1.20 1.20 1.20; dur: 1050; dir: alternate; loop: true"></a-sphere>
-          <!-- Needle towards target -->
-          <a-cylinder position="0.09 0.065 0.18" radius="0.008" height="0.31" rotation="-48 0 31" material="color:#ecf7fc; metalness:.8"></a-cylinder>
-          <a-cone position="-0.005 -0.015 0.10" radius-bottom="0.012" radius-top="0" height="0.055" rotation="-48 0 31" material="color:#ffba62"></a-cone>
-          <!-- 3D axes -->
-          <a-cylinder position="-.25 -.15 .12" radius="0.003" height="0.19" rotation="0 0 -90" color="#ff6868"></a-cylinder>
-          <a-cylinder position="-.345 -.055 .12" radius="0.003" height="0.19" color="#53e48f"></a-cylinder>
-          <a-cylinder position="-.345 -.15 .215" radius="0.003" height="0.19" rotation="90 0 0" color="#77a8ff"></a-cylinder>
-          <a-text value="X" position="-.14 -.16 .12" width=".22" color="#ff7777" align="center"></a-text>
-          <a-text value="Y" position="-.345 .07 .12" width=".22" color="#76ffb2" align="center"></a-text>
-          <a-text value="Z" position="-.345 -.15 .34" width=".22" color="#9cbbff" align="center"></a-text>
-          <!-- Floating labels -->
-          <a-text value="IMAGE-GUIDED NAVIGATION" position="0 .25 .14" width=".87" align="center" color="#ffffff" font="kelsonsans"></a-text>
-          <a-text value="US  /  TRACKING  /  TARGET" position="0 .20 .14" width=".68" align="center" color="#83eef4"></a-text>
-          <a-text value="3D TARGET" position="0 -.27 .12" width=".50" align="center" color="#ffce84"></a-text>
-          <a-ring position="0 -0.04 .22" radius-inner=".05" radius-outer=".052" color="#ffce84" animation="property: rotation; to: 0 0 360; dur: 6000; loop: true; easing: linear"></a-ring>
-        </a-entity>
-      </a-entity>
-    </a-entity>
-
-    <a-entity mindar-image-target="targetIndex: 1" target-events>
-      <a-entity position="0 0 0.12">
-        <a-text value="ULTRASOUND" align="center" color="#ffffff" width="1.15" position="0 0.38 0.06"></a-text>
-        <a-box width="0.33" height="0.44" depth="0.10" color="#265b75" rotation="-12 0 0" position="0 0.04 0"></a-box>
-        <a-cylinder radius="0.12" height="0.16" rotation="90 0 0" position="0 -0.22 0.02" color="#d5e4ed"></a-cylinder>
-        <a-cone position="0 -0.32 0.08" rotation="180 0 0" radius-bottom="0.25" radius-top="0" height="0.32" material="color:#46dce8;transparent:true;opacity:0.28;side:double" animation="property: material.opacity; from: 0.12; to: 0.38; dur: 1300; dir: alternate; loop: true"></a-cone>
-        <a-torus radius="0.12" radius-tubular="0.006" color="#60edf0" position="0 -0.34 0.14" animation="property: rotation; to: 0 0 360; dur: 4000; loop: true; easing: linear"></a-torus>
-      </a-entity>
-    </a-entity>
-    
-    
-  </a-scene>
+  <div class="status-line"><div><span class="dot"></span><span id="status">Ready to scan Fig. 1</span></div><a class="link small" href="target.html">Fig. 1 target</a></div>
+ </footer>
+</div>
+<div id="preview">
+ <div class="card">
+  <div class="cols">
+   <div class="panel">
+     <h3 id="preview-screen-title">Graph GUI · NDI Polaris</h3>
+     <div class="line" id="preview-tracker">NDI Polaris → Tracker frame</div>
+     <div class="line">Register: Needle · US · Projector</div>
+     <div class="line">Calibrate: US image · Projection</div>
+     <div class="line">Navigation: Target → Needle guidance</div>
+   </div>
+   <div class="panel">
+     <h3 id="preview-setup-title">Physical setup</h3>
+     <div class="step" id="preview-camera">🎥 Stereo-optical Polaris camera</div>
+     <div class="step">🧪 Gelatin phantom</div>
+     <div class="step">◈ Tracked ultrasound probe</div>
+     <div class="step">╱ Biopsy needle</div>
+     <div class="step">▣ Projector guidance</div>
+   </div>
   </div>
-  <script>
-    // MindAR starts automatically as soon as the scene is ready.
-    // The browser itself asks the visitor to grant camera permission.
-    const scene = document.querySelector('a-scene');
-    const toggle = document.getElementById('toggle');
-    const stop = document.getElementById('stop');
-    const status = document.getElementById('status');
-    const content = Array.from(document.querySelectorAll('[mindar-image-target] > a-entity'));
-    const errorPanel = document.getElementById('error-panel');
-    const errorMessage = document.getElementById('error-message');
-
-    scene.addEventListener('arReady', () => {
-      status.textContent = 'Scan one of the two target images';
-      toggle.disabled = false;
-      stop.disabled = false;
-    });
-    scene.addEventListener('arError', (e) => {
-      status.textContent = 'Camera unavailable';
-      errorMessage.textContent = 'Unable to start the camera. Check browser permissions and reload the page.';
-      errorPanel.style.display = 'block';
-    });
-    toggle.addEventListener('click', () => {
-      const show = !content[0].object3D.visible;
-      content.forEach(entity => { entity.object3D.visible = show; });
-      toggle.textContent = show ? 'Hide 3D' : 'Show 3D';
-    });
-    stop.addEventListener('click', () => location.reload());
-  </script>
+  <div class="unchanged">Retained: US probe · Needle · Phantom · Projector · Navigation workflow</div>
+ </div>
+</div>
+<div id="debug"><div class="welcome"><h2>Target not ready</h2><p id="error-message">This WebAR page needs the compiled Fig. 1 image target.</p><button id="try-preview" class="primary">Explore without camera</button><p><a class="link" href="target.html">How to compile the target</a></p></div></div>
+<a-scene id="scene" embedded renderer="colorManagement:true;alpha:true;antialias:true" vr-mode-ui="enabled:false"
+  device-orientation-permission-ui="enabled:false"
+  mindar-image="imageTargetSrc: ./fig1.mind; autoStart:false; uiLoading:no; uiScanning:no; uiError:no; maxTrack:1; filterMinCF:0.001; filterBeta:0.04; warmupTolerance:5; missTolerance:8">
+ <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
+ <a-assets><canvas id="graph-canvas" width="1024" height="640"></canvas></a-assets>
+ <a-entity id="target" mindar-image-target="targetIndex:0">
+  <a-entity id="overlay" position="0 0 0.075" rotation="0 0 0">
+   <a-plane width="1.37" height=".68" color="#081f30" opacity=".91" position="0 0 -.025"
+            material="transparent:true;side:double"></a-plane>
+   <a-text value="GRAPH WORKFLOW" color="#7ce9fa" position="-.62 .29 .006" width=".74"></a-text>
+   <a-text value="SHARED PHYSICAL SETUP" color="#7ce9fa" position=".15 .29 .006" width=".74"></a-text>
+   <!-- Live 2D software view on the left -->
+   <a-plane id="graph-plane" position="-.335 -.034 .01" width=".61" height=".44" material="src:#graph-canvas;shader:flat;side:double"></a-plane>
+   <!-- simplified but physically interpretable equipment setup on the right -->
+   <a-entity id="setup" position=".355 -.067 .055" scale=".82 .82 .82">
+     <!-- table and gelatin phantom -->
+     <a-box position="0 -.14 -.04" width=".45" height=".025" depth=".25" color="#405968"></a-box>
+     <a-box position="0 -.08 .015" width=".235" height=".105" depth=".165" material="color:#74c7db;opacity:.52;transparent:true"></a-box>
+     <a-sphere position=".018 -.053 .073" radius=".018" material="color:#ffbe67;emissive:#8f4814;emissiveIntensity:.4"></a-sphere>
+     <!-- US probe with imaging cone -->
+     <a-cylinder position="-.094 .043 .06" height=".15" radius=".021" rotation="0 0 -24" color="#e4edf6"></a-cylinder>
+     <a-cone position="-.117 -.045 .07" radius-bottom=".07" radius-top=".005" height=".13" rotation="180 0 0" material="color:#49b7f1;transparent:true;opacity:.22;side:double"></a-cone>
+     <!-- needle -->
+     <a-cylinder position=".094 .027 .084" height=".265" radius=".004" rotation="0 0 35" color="#ebf4f7"></a-cylinder>
+     <a-sphere position=".019 -.048 .087" radius=".009" color="#f1e8de"></a-sphere>
+     <!-- projector -->
+     <a-box position=".195 .163 -.04" width=".105" height=".055" depth=".08" color="#384d5c"></a-box>
+     <a-cylinder position=".15 .164 .003" rotation="90 0 0" radius=".019" height=".009" color="#77e0e9"></a-cylinder>
+     <a-cone position=".095 .027 -.03" radius-bottom=".17" radius-top=".008" height=".23" rotation="0 0 -22" material="color:#7df3d8;transparent:true;opacity:.12;side:double"></a-cone>
+     <!-- NDI stereo tracker -->
+     <a-entity id="ndi-hardware">
+       <a-box position="-.205 .195 -.06" width=".18" height=".045" depth=".05" color="#b9cbd2"></a-box>
+       <a-sphere position="-.269 .193 -.015" radius=".013" color="#e8ebef"></a-sphere>
+       <a-sphere position="-.141 .193 -.015" radius=".013" color="#e8ebef"></a-sphere>
+       <a-cylinder position="-.205 .076 -.06" height=".19" radius=".009" color="#97aab2"></a-cylinder>
+     </a-entity>
+     <!-- monocular tracker -->
+     <a-entity id="nir-hardware" visible="false">
+       <a-box position="-.212 .195 -.06" width=".105" height=".085" depth=".09" color="#183448"></a-box>
+       <a-cylinder position="-.212 .195 -.005" rotation="90 0 0" height=".042" radius=".037" color="#546979"></a-cylinder>
+       <a-torus position="-.212 .195 .02" radius=".031" radius-tubular=".005" color="#ed7979" rotation="90 0 0"></a-torus>
+       <a-cylinder position="-.212 .082 -.06" height=".16" radius=".009" color="#97aab2"></a-cylinder>
+       <a-dodecahedron position="-.055 .037 .11" radius=".03" color="#efc96d"></a-dodecahedron>
+     </a-entity>
+   </a-entity>
+   <a-text id="ar-label" value="NDI POLARIS" align="center" position=".344 -.294 .008" width=".65" color="#fff"></a-text>
+   <a-text value="SAME PROBE  /  NEEDLE  /  PHANTOM  /  PROJECTOR" align="center" position="0 -.343 .008" width="1.1" color="#70e5ae"></a-text>
+  </a-entity>
+ </a-entity>
+</a-scene>
+<script>
+(() => {
+ const scene=document.getElementById('scene'), target=document.getElementById('target');
+ const stat=document.getElementById('status'), root=document.body;
+ const pol=document.getElementById('polaris'), nir=document.getElementById('monocular');
+ const graph=document.getElementById('graph-canvas'), ctx=graph.getContext('2d');
+ let mode='polaris', cameraStarted=false;
+ const params=new URLSearchParams(location.search);
+ const isPreview=params.get('preview')==='1';
+ function text(s,x,y,size,color,weight='600'){
+   ctx.font=weight+' '+size+'px system-ui,Arial';ctx.fillStyle=color;ctx.fillText(s,x,y);
+ }
+ function box(x,y,w,h,color,stroke='#b7dce9'){
+   ctx.fillStyle=color;ctx.fillRect(x,y,w,h);ctx.strokeStyle=stroke;ctx.lineWidth=3;ctx.strokeRect(x,y,w,h);
+ }
+ function line(x1,y1,x2,y2,color){
+   ctx.strokeStyle=color;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+ }
+ function redraw(){
+   ctx.fillStyle='#e9f3f8';ctx.fillRect(0,0,1024,640);
+   ctx.fillStyle='#173d5b';ctx.fillRect(0,0,1024,78);
+   text('MODULAR REGISTRATION GRAPH',27,48,30,'white','800');
+   const tracker=mode==='polaris'?'NDI POLARIS':'MONOCULAR NIR / ARUCO';
+   box(33,212,245,150,'#ffffff','#3797c0');
+   text(tracker,45,263,23,'#0d527b','800');
+   text('Tracking frame',45,306,19,'#486572');
+   line(278,287,390,287,'#36a670');
+   [['Needle',407,118],['Ultrasound',407,258],['Projector',407,405]].forEach(([name,x,y],i)=>{
+      line(390,287,x,y+59,'#32a475');
+      box(x,y,248,116,'#fff','#59accb');
+      text(name,x+22,y+47,25,'#0f415e','800');text('Register / Calibrate',x+22,y+81,18,'#1e9d73');
+   });
+   box(712,169,275,312,'#0c2331','#45c4e3');
+   text('3D SLICER',744,213,28,'#9dedf7','800');
+   text('Ultrasound view',734,254,21,'#d7edf5');
+   ctx.fillStyle='#142f3b';ctx.fillRect(749,279,210,159);
+   ctx.strokeStyle='#58c4e6';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(780,310);ctx.quadraticCurveTo(842,419,934,310);ctx.stroke();
+   ctx.fillStyle='#f5b65c';ctx.beginPath();ctx.arc(852,355,14,0,Math.PI*2);ctx.fill();
+   text('Target',834,467,19,'#c9dee9');
+   document.getElementById('ndi-hardware').setAttribute('visible',mode==='polaris');
+   document.getElementById('nir-hardware').setAttribute('visible',mode==='monocular');
+   document.getElementById('ar-label').setAttribute('value',mode==='polaris'?'NDI POLARIS':'MONOCULAR NIR');
+   document.getElementById('preview-screen-title').textContent='Graph GUI · '+(mode==='polaris'?'NDI Polaris':'Monocular NIR');
+   document.getElementById('preview-tracker').textContent=(mode==='polaris'?'NDI Polaris':'NIR camera + ArUco')+' → Tracker frame';
+   document.getElementById('preview-camera').textContent=mode==='polaris'?'🎥 Stereo-optical Polaris camera':'🎥 Monocular NIR camera + ArUco marker';
+   pol.setAttribute('aria-pressed',mode==='polaris'?'true':'false');
+   nir.setAttribute('aria-pressed',mode==='monocular'?'true':'false');
+   const m=document.getElementById('graph-plane').getObject3D('mesh');
+   if(m?.material?.map)m.material.map.needsUpdate=true;
+ }
+ pol.addEventListener('click',()=>{mode='polaris';redraw()});
+ nir.addEventListener('click',()=>{mode='monocular';redraw()});
+ document.getElementById('try-preview').addEventListener('click',()=>{
+   document.getElementById('debug').style.display='none';
+   document.getElementById('preview').style.display='flex';
+   stat.textContent='2D preview · AR requires fig1.mind';
+ });
+ function fail(msg){
+   if(isPreview)return;
+   document.getElementById('error-message').textContent=msg;
+   document.getElementById('debug').style.display='grid';
+   stat.textContent='Image target unavailable';
+ }
+ function mark(isFound){
+   root.classList.toggle('tracked',isFound);
+   stat.textContent=isFound?'Fig. 1 detected · switch trackers':'Point the camera at Fig. 1';
+ }
+ target.addEventListener('targetFound',()=>mark(true));
+ target.addEventListener('targetLost',()=>mark(false));
+ scene.addEventListener('arReady',()=>mark(false));
+ scene.addEventListener('arError',()=>fail('Camera or image target unavailable. Verify fig1.mind is deployed, grant camera access, and reload.'));
+ window.addEventListener('unhandledrejection',(event)=>{
+   const msg=String(event.reason||'');
+   if(msg.includes('fig1.mind')||msg.includes('target')||msg.includes('fetch')) fail('fig1.mind is missing or invalid. Compile Fig. 1 and upload it to this repository.');
+ });
+ document.getElementById('start').addEventListener('click',async()=>{
+   document.getElementById('intro').classList.add('hide');
+   if(isPreview){document.getElementById('preview').style.display='flex';stat.textContent='Interactive 2D preview';redraw();return;}
+   try{
+     const resp=await fetch('./fig1.mind',{cache:'no-store'});
+     if(!resp.ok)throw Error('Missing compiled target');
+     const bytes=await resp.arrayBuffer();
+     if(bytes.byteLength<1024)throw Error('Compiled target too small');
+     if(!cameraStarted){
+       cameraStarted=true;
+       if(scene.hasLoaded){await scene.systems['mindar-image-system'].start();}
+       else{scene.addEventListener('loaded',()=>scene.systems['mindar-image-system'].start(),{once:true});}
+     }
+   }catch(e){fail('The compiled target fig1.mind is not yet deployed. Use the 2D preview or compile Fig. 1 following the instructions.');}
+ });
+ if(isPreview){document.getElementById('intro').classList.add('hide');document.getElementById('preview').style.display='flex';}
+ redraw();
+})();
+</script>
 </body>
 </html>
