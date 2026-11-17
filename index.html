@@ -53,9 +53,9 @@ button{font:700 13px system-ui;cursor:pointer}
  <div class="welcome">
   <div class="eyebrow">SPIE MEDICAL IMAGING 2027 · WEBAR</div>
   <h2>One workflow.<br>Two trackers.</h2>
-  <p>Point your phone at <strong>Fig. 1</strong>, the graph-based platform figure in the poster. Switch trackers to explore the unchanged navigation setup.</p>
+  <p>Point your camera at the <strong>poster</strong> and hold it steady. Switch between NDI Polaris and Monocular NIR to explore the same navigation workflow.</p>
   <button id="start" class="primary">Start camera</button>
-  <div class="warning" id="preflight">Fig. 1 is the only tracking target. For best alignment, hold the phone upright.</div>
+  <div class="warning" id="preflight">Aim at the poster in good lighting. Hold the phone steady as tracking locks on.</div>
   <p><a class="link" href="target.html">View target image / setup instructions</a></p>
  </div>
 </div>
@@ -70,7 +70,7 @@ button{font:700 13px system-ui;cursor:pointer}
    <button class="choice" id="polaris" aria-pressed="true">NDI Polaris</button>
    <button class="choice" id="monocular" aria-pressed="false">Monocular NIR</button>
   </div>
-  <div class="status-line"><div><span class="dot"></span><span id="status">Ready to scan Fig. 1</span></div><a class="link small" href="target.html">Fig. 1 target</a></div>
+  <div class="status-line"><div><span class="dot"></span><span id="status">Point at the poster</span></div><a class="link small" href="target.html">Poster target</a></div>
  </footer>
 </div>
 <div id="preview">
@@ -214,7 +214,7 @@ button{font:700 13px system-ui;cursor:pointer}
  }
  function mark(isFound){
    root.classList.toggle('tracked',isFound);
-   stat.textContent=isFound?'Fig. 1 detected · switch trackers':'Point the camera at Fig. 1';
+   stat.textContent=isFound?'Poster detected · switch trackers':'Point the camera at the poster';
  }
  target.addEventListener('targetFound',()=>mark(true));
  target.addEventListener('targetLost',()=>mark(false));
