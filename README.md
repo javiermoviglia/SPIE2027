@@ -1,30 +1,45 @@
-# SPIE 2027: One workflow, two trackers
+# SPIE 2027 — Markerless augmented reality
 
-Single-image-target WebAR demonstration of the modular registration platform.
+Markerless AR demonstration for the paper **A Modular Registration Platform for Image-Guided Interventions**.
 
-**Fig. 1** (the graph-based platform image) is the only image target. Two phone buttons alternate **NDI Polaris** and **Monocular NIR / ArUco**. Each view places a conceptual software-graph screen next to a simplified setup: gelatin phantom, tracked ultrasound probe, needle, projector guidance and the selected optical tracker.
+Live: https://javiermoviglia.github.io/SPIE2027/
 
-The tracker and marker type change; the ultrasound-guided navigation workflow remains the same.
+## Visitor workflow
 
-These are illustrative conceptual graphics, not actual software screenshots or CAD models. This is an explanation of workflow reconfiguration rather than accuracy measurement.
+1. Open the poster QR link on an AR-compatible iPhone or Android smartphone.
+2. Choose **NDI Polaris** or **Monocular NIR** in the web UI.
+3. Select **View in AR**. A native viewer opens if supported.
+4. Slowly scan the table or floor, place the model, and physically move closer or around it.
+5. To switch trackers, return to the web page, select the other configuration, and enter AR again.
 
-## Required target files
+No poster image target or MindAR library is needed in main.
 
-The web code is included, but camera-based recognition needs two binary assets added to the repository:
+## Technical implementation
 
-1. Upload the user's exact Fig. 1 image as **fig1.jpg** to the repository root.
-2. Open https://hiukim.github.io/mind-ar-js-doc/tools/compile/ and compile only this image.
-3. Download the file, rename it **fig1.mind**, and upload it to the repository root.
-4. Merge the feature branch to main; open https://javiermoviglia.github.io/SPIE2027/ on an HTTPS-enabled phone and scan Fig. 1.
+- Google model-viewer 4.3.0 through jsDelivr.
+- Self-contained GLB models, with geometry in meters.
+- Android: Scene Viewer or WebXR on a supported ARCore device.
+- iPhone Safari: AR Quick Look using a USDZ generated on demand by model-viewer from the selected static GLB.
+- The native AR view does not retain the website's HTML configuration buttons; select the tracker first.
+- If AR is unsupported, the 3D viewer remains available in the webpage.
+- Requires HTTPS, provided by GitHub Pages.
 
-Do not compile the entire poster or substitute a different crop. Print matte and large enough for stable tracking.
+## Files
 
-## Test and preview
+- index.html: responsive viewer, two tracker options, native AR launch.
+- models/ndi-polaris.glb: illustration of NDI Polaris and shared navigation hardware.
+- models/monocular-nir.glb: illustration of monocular NIR/ArUco and the same shared hardware.
+- mindAR branch: full backup of the former image-target tracking implementation.
 
-- AR page: https://javiermoviglia.github.io/SPIE2027/
-- Fig. 1 instructions: https://javiermoviglia.github.io/SPIE2027/target.html
-- **2D-only preview:** https://javiermoviglia.github.io/SPIE2027/?preview=1
-- One image target, index 0. No external example targets.
-- Test camera recognition, both switch buttons, reacquisition, iOS Safari and Android Chrome before the conference.
+These GLB files are **conceptual 3D reconstructions** rather than engineering CAD, measured geometry, or real software screens. They illustrate modular reconfiguration and are not validated clinical navigation data.
 
-Stack: A-Frame 1.5.0 and MindAR 1.2.5.
+## Device verification checklist
+
+- [ ] Open models and switch configurations in Safari on a real iPhone.
+- [ ] Place both variants in iOS Quick Look on an ARKit-compatible iPhone.
+- [ ] Place both variants through Android Scene Viewer on a compatible ARCore phone.
+- [ ] Move physically closer to the phantom to confirm device-based positional tracking.
+- [ ] Ensure the model height/scale looks appropriate on a table and on the floor.
+- [ ] Check QR points to GitHub Pages and not the previous target-tracking page.
+
+Reference: https://modelviewer.dev/docs/index.html

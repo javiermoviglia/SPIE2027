@@ -1,330 +1,110 @@
 <!doctype html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#071625">
-<title>SPIE 2027 · One workflow, two tracking systems</title>
-<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+<meta name="theme-color" content="#081c2b">
+<meta name="description" content="SPIE Medical Imaging: interactive 3D and markerless AR navigation setup">
+<title>SPIE 2027 | One workflow, two trackers</title>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.0/dist/model-viewer.min.js"></script>
 <style>
-:root{--blue:#4dd2f2;--accent:#f7b358;--bg:#071625;--glass:rgba(9,27,44,.91)}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);font-family:Inter,system-ui,Arial,sans-serif;color:#fff}
-#ar-viewport{position:fixed;inset:0;width:100%;height:100%;height:100dvh;overflow:hidden;isolation:isolate;z-index:0}#ar-viewport a-scene{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:0}#ar-viewport video{max-width:none!important;max-height:none!important;object-fit:fill!important}
-.a-enter-vr-button,.a-enter-ar-button{display:none!important}
-.hud{pointer-events:none;position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 12px calc(10px + env(safe-area-inset-bottom));gap:10px}
-.head,.controls{width:min(100%,520px);margin:0 auto;background:var(--glass);border:1px solid #3b627d;border-radius:16px;padding:12px 15px;box-shadow:0 8px 35px #0007;backdrop-filter:blur(10px)}
-.eyebrow{font-size:10px;letter-spacing:.13em;color:var(--blue);font-weight:800}
-h1{margin:4px 0 2px;font-size:17px;line-height:1.25}
-.sub{color:#c2d7e6;font-size:12px;margin:0}
-.controls{pointer-events:auto}
-.switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-button{font:700 13px system-ui;cursor:pointer}
-.choice{border:1px solid #6b889b;padding:12px 9px;border-radius:11px;background:#17374c;color:#eff8ff}
-.choice[aria-pressed="true"]{border:2px solid var(--blue);background:#095c72;box-shadow:inset 0 0 0 1px #8cf6ff}
-.status-line{display:flex;gap:8px;justify-content:space-between;align-items:center;font-size:12px;color:#c5dbe7;line-height:1.35}
-.dot{flex:0 0 9px;width:9px;height:9px;border-radius:100%;background:#f3b457;display:inline-block;margin-right:6px}
-.tracked .dot{background:#65f1a1}
-.small{font-size:11px;color:#b5cedc}
-.link{pointer-events:auto;color:#8de9fa;text-decoration:underline}
-#intro{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:linear-gradient(150deg,#071625,#103a58);padding:20px}
-#intro.hide{display:none}
-.welcome{width:min(440px,100%);background:#0c263c;border:1px solid #326484;border-radius:21px;padding:25px;text-align:center;box-shadow:0 20px 80px #0008}
-.welcome h2{font-size:28px;margin:6px 0 10px}
-.welcome p{color:#d1e2ec;line-height:1.5;font-size:14px}
-.primary{border:0;border-radius:11px;padding:14px 18px;width:100%;background:#71e2f3;color:#062535;font-size:16px}
-.warning{margin:12px 0 0;font-size:12px;color:#ffcca8}
-#debug{position:fixed;inset:0;z-index:30;display:none;place-items:center;background:#061622ed;padding:25px}
-#debug .welcome{max-width:420px}
-#preview{position:fixed;inset:0;z-index:1;display:none;align-items:center;justify-content:center;padding:120px 12px 145px;pointer-events:none}
-#preview .card{width:min(100%,460px);background:#f5faff;color:#102b3b;border-radius:14px;padding:12px;box-shadow:0 14px 35px #0007;border:2px solid #72d9ec}
-#preview .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-#preview .panel{min-height:170px;background:white;border:1px solid #ccdce5;border-radius:9px;padding:10px}
-#preview h3{font-size:13px;color:#0a527b;margin:0 0 8px}
-#preview .line{padding:5px;border-radius:5px;background:#eaf2f8;margin-bottom:6px;font-size:11px}
-#preview .step{font-size:11px;color:#284a5a;margin:4px 0}
-#preview .unchanged{background:#e1f5e7;border-radius:7px;padding:8px;color:#195633;font-size:11px;margin-top:10px;font-weight:700}
-@media(max-height:600px){.head,.controls{padding:8px 12px}.choice{padding:8px 4px}#preview{padding-top:90px;padding-bottom:95px}}
-</style>
-</head>
-<body>
-<div id="intro">
- <div class="welcome">
-  <div class="eyebrow">SPIE MEDICAL IMAGING 2027 · WEBAR</div>
-  <h2>One workflow.<br>Two trackers.</h2>
-  <p>Point your camera at the <strong>poster</strong> and hold it steady. Switch between NDI Polaris and Monocular NIR to explore the same navigation workflow.</p>
-  <button id="start" class="primary">Start camera</button>
-  <div class="warning" id="preflight">Aim at the poster in good lighting. Hold the phone steady as tracking locks on.</div>
-  <p><a class="link" href="target.html">View target image / setup instructions</a></p>
- </div>
-</div>
-<div class="hud">
- <header class="head">
-  <div class="eyebrow">MODULAR REGISTRATION PLATFORM</div>
-  <h1>Reconfigure the tracker — keep the workflow</h1>
-  <p class="sub">Virtual comparison · scientific demonstration</p>
- </header>
- <footer class="controls">
-  <div class="switch" role="group" aria-label="Choose tracking system">
-   <button class="choice" id="polaris" aria-pressed="true">NDI Polaris</button>
-   <button class="choice" id="monocular" aria-pressed="false">Monocular NIR</button>
-  </div>
-  <div class="status-line"><div><span class="dot"></span><span id="status">Point at the poster</span></div><a class="link small" href="target.html">Poster target</a></div>
- </footer>
-</div>
-<div id="preview">
- <div class="card">
-  <div class="cols">
-   <div class="panel">
-     <h3 id="preview-screen-title">Graph GUI · NDI Polaris</h3>
-     <div class="line" id="preview-tracker">NDI Polaris → Tracker frame</div>
-     <div class="line">Register: Needle · US · Projector</div>
-     <div class="line">Calibrate: US image · Projection</div>
-     <div class="line">Navigation: Target → Needle guidance</div>
-   </div>
-   <div class="panel">
-     <h3 id="preview-setup-title">Physical setup</h3>
-     <div class="step" id="preview-camera">🎥 Stereo-optical Polaris camera</div>
-     <div class="step">🧪 Gelatin phantom</div>
-     <div class="step">◈ Tracked ultrasound probe</div>
-     <div class="step">╱ Biopsy needle</div>
-     <div class="step">▣ Projector guidance</div>
-   </div>
-  </div>
-  <div class="unchanged">Retained: US probe · Needle · Phantom · Projector · Navigation workflow</div>
- </div>
-</div>
-<div id="debug"><div class="welcome"><h2>Target not ready</h2><p id="error-message">This WebAR page needs the compiled poster image target.</p><button id="try-preview" class="primary">Explore without camera</button><p><a class="link" href="target.html">How to compile the target</a></p></div></div>
-<!-- MindAR appends its camera video beside a-scene within this isolated full-viewport wrapper. -->
-<div id="ar-viewport">
-<a-scene id="scene" embedded renderer="colorManagement:true;alpha:true;antialias:true" vr-mode-ui="enabled:false"
-  device-orientation-permission-ui="enabled:false"
-  mindar-image="imageTargetSrc: ./fig1.mind; autoStart:false; uiLoading:no; uiScanning:no; uiError:no; maxTrack:1; filterMinCF:0.0005; filterBeta:0.015; warmupTolerance:7; missTolerance:12">
- <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
- <a-assets><canvas id="graph-canvas" width="1024" height="640"></canvas></a-assets>
- <a-entity id="target" mindar-image-target="targetIndex:0"></a-entity>
- <!-- Rendering is decoupled from the raw MindAR tracking pose for temporal stabilization. -->
- <a-entity id="smooth-anchor" visible="false">
-  <a-entity id="overlay" position="0 0 0.075" rotation="0 0 0">
-   <a-plane width="1.37" height=".68" color="#081f30" opacity=".91" position="0 0 -.025"
-            material="transparent:true;side:double"></a-plane>
-   <a-text value="GRAPH WORKFLOW" color="#7ce9fa" position="-.62 .29 .006" width=".74"></a-text>
-   <a-text value="SHARED PHYSICAL SETUP" color="#7ce9fa" position=".15 .29 .006" width=".74"></a-text>
-   <!-- Live 2D software view on the left -->
-   <a-plane id="graph-plane" position="-.335 -.034 .01" width=".61" height=".44" material="src:#graph-canvas;shader:flat;side:double"></a-plane>
-   <!-- simplified but physically interpretable equipment setup on the right -->
-   <a-entity id="setup" position=".355 -.067 .055" scale=".82 .82 .82">
-     <!-- table and gelatin phantom -->
-     <a-box position="0 -.14 -.04" width=".45" height=".025" depth=".25" color="#405968"></a-box>
-     <a-box position="0 -.08 .015" width=".235" height=".105" depth=".165" material="color:#74c7db;opacity:.52;transparent:true"></a-box>
-     <a-sphere position=".018 -.053 .073" radius=".018" material="color:#ffbe67;emissive:#8f4814;emissiveIntensity:.4"></a-sphere>
-     <!-- US probe with imaging cone -->
-     <a-cylinder position="-.094 .043 .06" height=".15" radius=".021" rotation="0 0 -24" color="#e4edf6"></a-cylinder>
-     <a-cone position="-.117 -.045 .07" radius-bottom=".07" radius-top=".005" height=".13" rotation="180 0 0" material="color:#49b7f1;transparent:true;opacity:.22;side:double"></a-cone>
-     <!-- needle -->
-     <a-cylinder position=".094 .027 .084" height=".265" radius=".004" rotation="0 0 35" color="#ebf4f7"></a-cylinder>
-     <a-sphere position=".019 -.048 .087" radius=".009" color="#f1e8de"></a-sphere>
-     <!-- projector -->
-     <a-box position=".195 .163 -.04" width=".105" height=".055" depth=".08" color="#384d5c"></a-box>
-     <a-cylinder position=".15 .164 .003" rotation="90 0 0" radius=".019" height=".009" color="#77e0e9"></a-cylinder>
-     <a-cone position=".095 .027 -.03" radius-bottom=".17" radius-top=".008" height=".23" rotation="0 0 -22" material="color:#7df3d8;transparent:true;opacity:.12;side:double"></a-cone>
-     <!-- NDI stereo tracker -->
-     <a-entity id="ndi-hardware">
-       <a-box position="-.205 .195 -.06" width=".18" height=".045" depth=".05" color="#b9cbd2"></a-box>
-       <a-sphere position="-.269 .193 -.015" radius=".013" color="#e8ebef"></a-sphere>
-       <a-sphere position="-.141 .193 -.015" radius=".013" color="#e8ebef"></a-sphere>
-       <a-cylinder position="-.205 .076 -.06" height=".19" radius=".009" color="#97aab2"></a-cylinder>
-     </a-entity>
-     <!-- monocular tracker -->
-     <a-entity id="nir-hardware" visible="false">
-       <a-box position="-.212 .195 -.06" width=".105" height=".085" depth=".09" color="#183448"></a-box>
-       <a-cylinder position="-.212 .195 -.005" rotation="90 0 0" height=".042" radius=".037" color="#546979"></a-cylinder>
-       <a-torus position="-.212 .195 .02" radius=".031" radius-tubular=".005" color="#ed7979" rotation="90 0 0"></a-torus>
-       <a-cylinder position="-.212 .082 -.06" height=".16" radius=".009" color="#97aab2"></a-cylinder>
-       <a-dodecahedron position="-.055 .037 .11" radius=".03" color="#efc96d"></a-dodecahedron>
-     </a-entity>
-   </a-entity>
-   <a-text id="ar-label" value="NDI POLARIS" align="center" position=".344 -.294 .008" width=".65" color="#fff"></a-text>
-   <a-text value="SAME PROBE  /  NEEDLE  /  PHANTOM  /  PROJECTOR" align="center" position="0 -.343 .008" width="1.1" color="#70e5ae"></a-text>
-  </a-entity>
- </a-entity>
-</a-scene>
-</div>
+:root{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#e5f2f9;background:#081c2b}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow-x:hidden}
+body{background:radial-gradient(ellipse at 50% -15%,#205373 0%,#102e42 35%,#081827 82%);min-height:100dvh}
+main{width:min(100%,1000px);margin:auto;min-height:100dvh;padding:clamp(15px,3vw,34px);display:flex;flex-direction:column;gap:15px}
+header{display:flex;justify-content:space-between;align-items:start;gap:16px}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:#84e2e9;font-weight:800}
+h1{font-size:clamp(25px,5vw,41px);letter-spacing:-.045em;line-height:1.07;margin:9px 0}
+.subtitle{font-size:clamp(12px,2.8vw,15px);color:#b2cbd8;line-height:1.5;margin:0}
+.logo{border:1px solid #467a94;border-radius:9px;padding:9px 12px;font-size:11px;font-weight:800;white-space:nowrap;color:#d4eefa}
+.stage{position:relative;min-height:51dvh;height:min(61dvh,680px);flex:1;background:radial-gradient(ellipse at 50% 40%,#355975,#193a51 55%,#0b2639 100%);border:1px solid #517c96;border-radius:22px;overflow:hidden;box-shadow:0 24px 55px #0007}
+model-viewer{display:block;width:100%;height:100%;--progress-bar-color:#75e9f3;--poster-color:transparent}
+.tag{position:absolute;left:16px;top:15px;padding:7px 10px;border-radius:8px;font-weight:800;font-size:10px;letter-spacing:.09em;color:#abf4f4;background:#0a273bcf;pointer-events:none}
+.hint{position:absolute;bottom:14px;left:15px;max-width:58%;font-size:11px;color:#d1e7f0;padding:8px 11px;border-radius:8px;background:#0c2a3dd9;pointer-events:none}
+.ar-button{position:absolute;bottom:15px;right:15px;border:0;border-radius:12px;color:#063040;background:#80e6ec;padding:13px 17px;font-size:14px;font-weight:850;box-shadow:0 9px 26px #0007;cursor:pointer}
+.ar-button:focus-visible,.choice:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice{background:#18384e;color:#edf7ff;text-align:left;border:1px solid #568298;border-radius:14px;padding:14px 16px;cursor:pointer}
+.choice.active{background:linear-gradient(115deg,#086078,#12485c);border:2px solid #79e5eb}
+.choice strong{display:block;font-size:15px}
+.choice small{display:block;font-size:11px;color:#c0d7e4;margin-top:5px}
+.note{display:flex;align-items:start;gap:12px;background:#0f2a3c;border:1px solid #365e72;border-radius:12px;padding:14px 16px}
+.note .symbol{font-size:21px;color:#79e6e9}
+.note strong{font-size:13px}
+.note p{font-size:12px;color:#bcd3e0;margin:6px 0 0;line-height:1.55}
+.status{position:absolute;top:53px;left:16px;font-size:11px;color:#f0faff;background:#0b3145e6;padding:6px 10px;border-radius:7px}
+.status:empty{display:none}
+footer{font-size:11px;color:#9ebaca;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}a{color:#8edce9}
+@media(max-width:560px){main{gap:12px;padding:14px}.logo{display:none}.stage{height:53dvh;min-height:47dvh}.choice{padding:12px}.choice strong{font-size:13px}.choice small{font-size:10px}.ar-button{padding:11px 13px;font-size:12px}.hint{font-size:10px}}
+</style></head><body><main>
+<header>
+ <div><div class="eyebrow">SPIE MEDICAL IMAGING 2027 · INTERACTIVE DEMO</div>
+ <h1>One workflow.<br>Two tracking systems.</h1>
+ <p class="subtitle">Explore a modular image-guided intervention setup in 3D.<br>No image target or poster recognition required.</p></div>
+ <div class="logo">MIISM · HEIDELBERG</div>
+</header>
+<section class="stage" aria-label="Three-dimensional navigation setup">
+ <model-viewer id="viewer"
+   src="./models/ndi-polaris.glb"
+   alt="Illustrative setup with stereo-optical Polaris tracker, phantom, ultrasound probe, needle, projector and registration workstation"
+   camera-controls
+   camera-orbit="35deg 68deg 3.7m"
+   camera-target="0m 0.9m 0m"
+   field-of-view="32deg"
+   min-camera-orbit="auto 20deg 1.1m"
+   max-camera-orbit="auto 90deg 7m"
+   interaction-prompt="auto"
+   shadow-intensity=".9"
+   shadow-softness=".9"
+   environment-image="neutral"
+   exposure="1.15"
+   loading="eager"
+   ar
+   ar-modes="scene-viewer webxr quick-look"
+   ar-placement="floor"
+   ar-scale="auto">
+  <button slot="ar-button" class="ar-button" aria-label="Place the selected model in your room">▣ View in AR</button>
+ </model-viewer>
+ <div class="tag">3D SETUP · SCHEMATIC</div>
+ <div class="hint">Drag to rotate · Pinch to zoom · Move closer in AR</div>
+ <div class="status" id="status" role="status" aria-live="polite"></div>
+</section>
+<section class="buttons" aria-label="Select the optical tracking system">
+ <button type="button" id="ndi" class="choice active" aria-pressed="true"><strong>NDI Polaris</strong><small>Stereo-optical tracker</small></button>
+ <button type="button" id="nir" class="choice" aria-pressed="false"><strong>Monocular NIR</strong><small>NIR camera + ArUco fiducial</small></button>
+</section>
+<aside class="note"><span class="symbol">◎</span><div><strong>Place the setup in your space</strong>
+<p>Select a tracker, then tap <b>View in AR</b>. Move the phone slowly to detect a table or floor, place the setup, and walk around it or approach the phantom. The ultrasound probe, needle, phantom, projector and navigation workflow remain the same.</p></div></aside>
+<footer><span>Scientific illustration · Not a clinical navigation display</span><span><a href="https://github.com/javiermoviglia/SPIE2027/tree/mindAR">Previous MindAR version</a> · <a href="https://github.com/javiermoviglia/SPIE2027">GitHub</a></span></footer>
+</main>
 <script>
 (() => {
- const scene=document.getElementById('scene'), target=document.getElementById('target');
- const stat=document.getElementById('status'), root=document.body;
- const pol=document.getElementById('polaris'), nir=document.getElementById('monocular');
- const graph=document.getElementById('graph-canvas'), ctx=graph.getContext('2d');
- let mode='polaris', cameraStarted=false;
- const params=new URLSearchParams(location.search);
- const isPreview=params.get('preview')==='1';
- function text(s,x,y,size,color,weight='600'){
-   ctx.font=weight+' '+size+'px system-ui,Arial';ctx.fillStyle=color;ctx.fillText(s,x,y);
- }
- function box(x,y,w,h,color,stroke='#b7dce9'){
-   ctx.fillStyle=color;ctx.fillRect(x,y,w,h);ctx.strokeStyle=stroke;ctx.lineWidth=3;ctx.strokeRect(x,y,w,h);
- }
- function line(x1,y1,x2,y2,color){
-   ctx.strokeStyle=color;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
- }
- function redraw(){
-   ctx.fillStyle='#e9f3f8';ctx.fillRect(0,0,1024,640);
-   ctx.fillStyle='#173d5b';ctx.fillRect(0,0,1024,78);
-   text('MODULAR REGISTRATION GRAPH',27,48,30,'white','800');
-   const tracker=mode==='polaris'?'NDI POLARIS':'MONOCULAR NIR / ARUCO';
-   box(33,212,245,150,'#ffffff','#3797c0');
-   text(tracker,45,263,23,'#0d527b','800');
-   text('Tracking frame',45,306,19,'#486572');
-   line(278,287,390,287,'#36a670');
-   [['Needle',407,118],['Ultrasound',407,258],['Projector',407,405]].forEach(([name,x,y],i)=>{
-      line(390,287,x,y+59,'#32a475');
-      box(x,y,248,116,'#fff','#59accb');
-      text(name,x+22,y+47,25,'#0f415e','800');text('Register / Calibrate',x+22,y+81,18,'#1e9d73');
-   });
-   box(712,169,275,312,'#0c2331','#45c4e3');
-   text('3D SLICER',744,213,28,'#9dedf7','800');
-   text('Ultrasound view',734,254,21,'#d7edf5');
-   ctx.fillStyle='#142f3b';ctx.fillRect(749,279,210,159);
-   ctx.strokeStyle='#58c4e6';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(780,310);ctx.quadraticCurveTo(842,419,934,310);ctx.stroke();
-   ctx.fillStyle='#f5b65c';ctx.beginPath();ctx.arc(852,355,14,0,Math.PI*2);ctx.fill();
-   text('Target',834,467,19,'#c9dee9');
-   document.getElementById('ndi-hardware').setAttribute('visible',mode==='polaris');
-   document.getElementById('nir-hardware').setAttribute('visible',mode==='monocular');
-   document.getElementById('ar-label').setAttribute('value',mode==='polaris'?'NDI POLARIS':'MONOCULAR NIR');
-   document.getElementById('preview-screen-title').textContent='Graph GUI · '+(mode==='polaris'?'NDI Polaris':'Monocular NIR');
-   document.getElementById('preview-tracker').textContent=(mode==='polaris'?'NDI Polaris':'NIR camera + ArUco')+' → Tracker frame';
-   document.getElementById('preview-camera').textContent=mode==='polaris'?'🎥 Stereo-optical Polaris camera':'🎥 Monocular NIR camera + ArUco marker';
-   pol.setAttribute('aria-pressed',mode==='polaris'?'true':'false');
-   nir.setAttribute('aria-pressed',mode==='monocular'?'true':'false');
-   const m=document.getElementById('graph-plane').getObject3D('mesh');
-   if(m?.material?.map)m.material.map.needsUpdate=true;
- }
- pol.addEventListener('click',()=>{mode='polaris';redraw()});
- nir.addEventListener('click',()=>{mode='monocular';redraw()});
- document.getElementById('try-preview').addEventListener('click',()=>{
-   document.getElementById('debug').style.display='none';
-   document.getElementById('preview').style.display='flex';
-   stat.textContent='2D preview · AR requires fig1.mind';
- });
- function fail(msg){
-   if(isPreview)return;
-   document.getElementById('error-message').textContent=msg;
-   document.getElementById('debug').style.display='grid';
-   stat.textContent='Image target unavailable';
- }
- // The tracked target reports noisy image-based poses. Do not attach the
- // visible model directly to that raw transform; filter a sibling anchor.
- const smoothAnchor=document.getElementById('smooth-anchor').object3D;
- const rawPosition=new THREE.Vector3();
- const rawRotation=new THREE.Quaternion();
- const rawScale=new THREE.Vector3();
- const nextPosition=new THREE.Vector3();
- const nextRotation=new THREE.Quaternion();
- const nextScale=new THREE.Vector3();
- const trackedMatrix=new THREE.Matrix4();
- let isTracking=false, initialized=false, lastFrame=0, lostAt=0;
- const positionDeadZone=0.003; // 0.3% of target image width in MindAR units
- const rotationDeadZone=THREE.MathUtils.degToRad(0.45);
- const lostGraceMs=240;
- function mark(isFound){
-   isTracking=isFound;
-   if(isFound){lostAt=0;}
-   else{lostAt=performance.now();}
-   root.classList.toggle('tracked',isFound);
-   stat.textContent=isFound?'Poster detected · switch trackers':'Point the camera at the poster';
- }
- target.addEventListener('targetFound',()=>mark(true));
- target.addEventListener('targetLost',()=>mark(false));
- function stabilize(timestamp){
-   requestAnimationFrame(stabilize);
-   const dt=Math.min(0.06,Math.max(0.008,(timestamp-(lastFrame||timestamp-16.7))/1000));
-   lastFrame=timestamp;
-   if(!isTracking){
-     if(lostAt && timestamp-lostAt>lostGraceMs){
-       smoothAnchor.visible=false;
-       initialized=false;
-       lostAt=0;
-     }
-     return;
-   }
-   const raw=target.object3D;
-   raw.updateWorldMatrix(true,false);
-   trackedMatrix.copy(raw.matrixWorld);
-   trackedMatrix.decompose(rawPosition,rawRotation,rawScale);
-   if(!Number.isFinite(rawPosition.x+rawPosition.y+rawPosition.z) ||
-      !Number.isFinite(rawRotation.x+rawRotation.y+rawRotation.z+rawRotation.w))return;
-   if(!initialized){
-     smoothAnchor.position.copy(rawPosition);
-     smoothAnchor.quaternion.copy(rawRotation);
-     smoothAnchor.scale.copy(rawScale);
-     smoothAnchor.visible=true;
-     initialized=true;
-     return;
-   }
-   const distance=smoothAnchor.position.distanceTo(rawPosition);
-   const angle=smoothAnchor.quaternion.angleTo(rawRotation);
-   // Hold micro-jitter near a stationary pose. Large real motions update faster.
-   // Exponential smoothing is frame-rate independent and avoids oscillations.
-   const positionHz=distance<0.018?1.8:distance<0.08?4.5:10;
-   const rotationHz=angle<THREE.MathUtils.degToRad(1.8)?2.2:
-                    angle<THREE.MathUtils.degToRad(8)?5.0:11;
-   const moveAlpha=1-Math.exp(-positionHz*dt);
-   const rotateAlpha=1-Math.exp(-rotationHz*dt);
-   if(distance>positionDeadZone){
-     nextPosition.copy(rawPosition);
-     smoothAnchor.position.lerp(nextPosition,moveAlpha);
-   }
-   if(angle>rotationDeadZone){
-     nextRotation.copy(rawRotation);
-     smoothAnchor.quaternion.slerp(nextRotation,rotateAlpha);
-   }
-   nextScale.copy(rawScale);
-   smoothAnchor.scale.lerp(nextScale,1-Math.exp(-4*dt));
- }
- requestAnimationFrame(stabilize);
- scene.addEventListener('arReady',()=>mark(false));
- scene.addEventListener('arError',()=>fail('Camera or image target unavailable. Verify fig1.mind is deployed, grant camera access, and reload.'));
- window.addEventListener('unhandledrejection',(event)=>{
-   const msg=String(event.reason||'');
-   if(msg.includes('fig1.mind')||msg.includes('target')||msg.includes('fetch')) fail('fig1.mind is missing or invalid. Compile Fig. 1 and upload it to this repository.');
- });
- document.getElementById('start').addEventListener('click',async()=>{
-   document.getElementById('intro').classList.add('hide');
-   if(isPreview){document.getElementById('preview').style.display='flex';stat.textContent='Interactive 2D preview';redraw();return;}
-   try{
-     const resp=await fetch('./fig1.mind',{cache:'no-store'});
-     if(!resp.ok)throw Error('Missing compiled target');
-     const bytes=await resp.arrayBuffer();
-     if(bytes.byteLength<1024)throw Error('Compiled target too small');
-     if(!cameraStarted){
-       cameraStarted=true;
-       if(scene.hasLoaded){await scene.systems['mindar-image-system'].start();}
-       else{scene.addEventListener('loaded',()=>scene.systems['mindar-image-system'].start(),{once:true});}
-     }
-   }catch(e){fail('The compiled target fig1.mind is not yet deployed. Use the 2D preview or compile Fig. 1 following the instructions.');}
- });
- if(isPreview){document.getElementById('intro').classList.add('hide');document.getElementById('preview').style.display='flex';}
- // Keep the renderer and MindAR's video in the same viewport after mobile browser chrome changes.
- const viewport=document.getElementById('ar-viewport');
- let scheduled=false;
- const alignViewport=()=>{
-   if(scheduled)return;
-   scheduled=true;
-   requestAnimationFrame(()=>{
-     scheduled=false;
-     if(!cameraStarted || !scene.hasLoaded)return;
-     const system=scene.systems['mindar-image-system'];
-     if(system?.video?.videoWidth && system?.controller){
-       try{system._resize();}catch(err){console.warn('MindAR viewport alignment:',err);}
-     }
-   });
+ const viewer=document.getElementById('viewer');
+ const choices={ndi:document.getElementById('ndi'),nir:document.getElementById('nir')};
+ const status=document.getElementById('status');
+ const variants={
+   ndi:{src:'./models/ndi-polaris.glb',name:'NDI Polaris',alt:'Schematic navigation setup with the NDI Polaris stereo-optical tracking system'},
+   nir:{src:'./models/monocular-nir.glb',name:'Monocular NIR',alt:'Schematic navigation setup with monocular NIR tracking camera and ArUco fiducial'}
  };
- window.visualViewport?.addEventListener('resize',alignViewport,{passive:true});
- window.addEventListener('orientationchange',alignViewport,{passive:true});
- redraw();
+ let current='ndi';
+ function select(key) {
+   if(key===current||!variants[key])return;
+   current=key;
+   viewer.src=variants[key].src;
+   viewer.alt=variants[key].alt;
+   for(const name of Object.keys(choices)){
+     const selected=name===key;
+     choices[name].classList.toggle('active',selected);
+     choices[name].setAttribute('aria-pressed',String(selected));
+   }
+   status.textContent='Loading '+variants[key].name+'…';
+ }
+ choices.ndi.addEventListener('click',()=>select('ndi'));
+ choices.nir.addEventListener('click',()=>select('nir'));
+ viewer.addEventListener('load',()=>{status.textContent='';});
+ viewer.addEventListener('error',e=>{status.textContent='Model could not be loaded. Please refresh.';console.error(e);});
+ viewer.addEventListener('ar-status',e=>{
+   if(e.detail.status==='failed')status.textContent='AR is unavailable on this phone. You can still explore the model in 3D.';
+ });
+ // On iPhone Quick Look and Android Scene Viewer, users must switch trackers BEFORE entering native AR.
 })();
-</script>
-</body>
-</html>
+</script></body></html>
