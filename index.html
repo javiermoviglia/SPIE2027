@@ -11,7 +11,7 @@
 :root{--blue:#4dd2f2;--accent:#f7b358;--bg:#071625;--glass:rgba(9,27,44,.91)}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);font-family:Inter,system-ui,Arial,sans-serif;color:#fff}
-a-scene{position:absolute!important;inset:0;width:100%;height:100%;z-index:0}
+#ar-viewport{position:fixed;inset:0;width:100%;height:100%;height:100dvh;overflow:hidden;isolation:isolate;z-index:0}#ar-viewport a-scene{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:0}#ar-viewport video{max-width:none!important;max-height:none!important;object-fit:fill!important}
 .a-enter-vr-button,.a-enter-ar-button{display:none!important}
 .hud{pointer-events:none;position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 12px calc(10px + env(safe-area-inset-bottom));gap:10px}
 .head,.controls{width:min(100%,520px);margin:0 auto;background:var(--glass);border:1px solid #3b627d;border-radius:16px;padding:12px 15px;box-shadow:0 8px 35px #0007;backdrop-filter:blur(10px)}
@@ -55,7 +55,7 @@ button{font:700 13px system-ui;cursor:pointer}
   <h2>One workflow.<br>Two trackers.</h2>
   <p>Point your phone at <strong>Fig. 1</strong>, the graph-based platform figure in the poster. Switch trackers to explore the unchanged navigation setup.</p>
   <button id="start" class="primary">Start camera</button>
-  <div class="warning" id="preflight">Requires a compiled Fig. 1 target file (<code>fig1.mind</code>).</div>
+  <div class="warning" id="preflight">Fig. 1 is the only tracking target. For best alignment, hold the phone upright.</div>
   <p><a class="link" href="target.html">View target image / setup instructions</a></p>
  </div>
 </div>
@@ -96,6 +96,8 @@ button{font:700 13px system-ui;cursor:pointer}
  </div>
 </div>
 <div id="debug"><div class="welcome"><h2>Target not ready</h2><p id="error-message">This WebAR page needs the compiled Fig. 1 image target.</p><button id="try-preview" class="primary">Explore without camera</button><p><a class="link" href="target.html">How to compile the target</a></p></div></div>
+<!-- MindAR appends its camera video beside a-scene within this isolated full-viewport wrapper. -->
+<div id="ar-viewport">
 <a-scene id="scene" embedded renderer="colorManagement:true;alpha:true;antialias:true" vr-mode-ui="enabled:false"
   device-orientation-permission-ui="enabled:false"
   mindar-image="imageTargetSrc: ./fig1.mind; autoStart:false; uiLoading:no; uiScanning:no; uiError:no; maxTrack:1; filterMinCF:0.001; filterBeta:0.04; warmupTolerance:5; missTolerance:8">
@@ -146,6 +148,7 @@ button{font:700 13px system-ui;cursor:pointer}
   </a-entity>
  </a-entity>
 </a-scene>
+</div>
 <script>
 (() => {
  const scene=document.getElementById('scene'), target=document.getElementById('target');
@@ -237,6 +240,23 @@ button{font:700 13px system-ui;cursor:pointer}
    }catch(e){fail('The compiled target fig1.mind is not yet deployed. Use the 2D preview or compile Fig. 1 following the instructions.');}
  });
  if(isPreview){document.getElementById('intro').classList.add('hide');document.getElementById('preview').style.display='flex';}
+ // Keep the renderer and MindAR's video in the same viewport after mobile browser chrome changes.
+ const viewport=document.getElementById('ar-viewport');
+ let scheduled=false;
+ const alignViewport=()=>{
+   if(scheduled)return;
+   scheduled=true;
+   requestAnimationFrame(()=>{
+     scheduled=false;
+     if(!cameraStarted || !scene.hasLoaded)return;
+     const system=scene.systems['mindar-image-system'];
+     if(system?.video?.videoWidth && system?.controller){
+       try{system._resize();}catch(err){console.warn('MindAR viewport alignment:',err);}
+     }
+   });
+ };
+ window.visualViewport?.addEventListener('resize',alignViewport,{passive:true});
+ window.addEventListener('orientationchange',alignViewport,{passive:true});
  redraw();
 })();
 </script>
