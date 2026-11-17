@@ -103,7 +103,9 @@ button{font:700 13px system-ui;cursor:pointer}
   mindar-image="imageTargetSrc: ./fig1.mind; autoStart:false; uiLoading:no; uiScanning:no; uiError:no; maxTrack:1; filterMinCF:0.0005; filterBeta:0.015; warmupTolerance:7; missTolerance:12">
  <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
  <a-assets><canvas id="graph-canvas" width="1024" height="640"></canvas></a-assets>
- <a-entity id="target" mindar-image-target="targetIndex:0">
+ <a-entity id="target" mindar-image-target="targetIndex:0"></a-entity>
+ <!-- Rendering is decoupled from the raw MindAR tracking pose for temporal stabilization. -->
+ <a-entity id="smooth-anchor" visible="false">
   <a-entity id="overlay" position="0 0 0.075" rotation="0 0 0">
    <a-plane width="1.37" height=".68" color="#081f30" opacity=".91" position="0 0 -.025"
             material="transparent:true;side:double"></a-plane>
@@ -212,12 +214,76 @@ button{font:700 13px system-ui;cursor:pointer}
    document.getElementById('debug').style.display='grid';
    stat.textContent='Image target unavailable';
  }
+ // The tracked target reports noisy image-based poses. Do not attach the
+ // visible model directly to that raw transform; filter a sibling anchor.
+ const smoothAnchor=document.getElementById('smooth-anchor').object3D;
+ const rawPosition=new THREE.Vector3();
+ const rawRotation=new THREE.Quaternion();
+ const rawScale=new THREE.Vector3();
+ const nextPosition=new THREE.Vector3();
+ const nextRotation=new THREE.Quaternion();
+ const nextScale=new THREE.Vector3();
+ const trackedMatrix=new THREE.Matrix4();
+ let isTracking=false, initialized=false, lastFrame=0, lostAt=0;
+ const positionDeadZone=0.003; // 0.3% of target image width in MindAR units
+ const rotationDeadZone=THREE.MathUtils.degToRad(0.45);
+ const lostGraceMs=240;
  function mark(isFound){
+   isTracking=isFound;
+   if(isFound){lostAt=0;}
+   else{lostAt=performance.now();}
    root.classList.toggle('tracked',isFound);
    stat.textContent=isFound?'Poster detected · switch trackers':'Point the camera at the poster';
  }
  target.addEventListener('targetFound',()=>mark(true));
  target.addEventListener('targetLost',()=>mark(false));
+ function stabilize(timestamp){
+   requestAnimationFrame(stabilize);
+   const dt=Math.min(0.06,Math.max(0.008,(timestamp-(lastFrame||timestamp-16.7))/1000));
+   lastFrame=timestamp;
+   if(!isTracking){
+     if(lostAt && timestamp-lostAt>lostGraceMs){
+       smoothAnchor.visible=false;
+       initialized=false;
+       lostAt=0;
+     }
+     return;
+   }
+   const raw=target.object3D;
+   raw.updateWorldMatrix(true,false);
+   trackedMatrix.copy(raw.matrixWorld);
+   trackedMatrix.decompose(rawPosition,rawRotation,rawScale);
+   if(!Number.isFinite(rawPosition.x+rawPosition.y+rawPosition.z) ||
+      !Number.isFinite(rawRotation.x+rawRotation.y+rawRotation.z+rawRotation.w))return;
+   if(!initialized){
+     smoothAnchor.position.copy(rawPosition);
+     smoothAnchor.quaternion.copy(rawRotation);
+     smoothAnchor.scale.copy(rawScale);
+     smoothAnchor.visible=true;
+     initialized=true;
+     return;
+   }
+   const distance=smoothAnchor.position.distanceTo(rawPosition);
+   const angle=smoothAnchor.quaternion.angleTo(rawRotation);
+   // Hold micro-jitter near a stationary pose. Large real motions update faster.
+   // Exponential smoothing is frame-rate independent and avoids oscillations.
+   const positionHz=distance<0.018?1.8:distance<0.08?4.5:10;
+   const rotationHz=angle<THREE.MathUtils.degToRad(1.8)?2.2:
+                    angle<THREE.MathUtils.degToRad(8)?5.0:11;
+   const moveAlpha=1-Math.exp(-positionHz*dt);
+   const rotateAlpha=1-Math.exp(-rotationHz*dt);
+   if(distance>positionDeadZone){
+     nextPosition.copy(rawPosition);
+     smoothAnchor.position.lerp(nextPosition,moveAlpha);
+   }
+   if(angle>rotationDeadZone){
+     nextRotation.copy(rawRotation);
+     smoothAnchor.quaternion.slerp(nextRotation,rotateAlpha);
+   }
+   nextScale.copy(rawScale);
+   smoothAnchor.scale.lerp(nextScale,1-Math.exp(-4*dt));
+ }
+ requestAnimationFrame(stabilize);
  scene.addEventListener('arReady',()=>mark(false));
  scene.addEventListener('arError',()=>fail('Camera or image target unavailable. Verify fig1.mind is deployed, grant camera access, and reload.'));
  window.addEventListener('unhandledrejection',(event)=>{
