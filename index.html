@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b2132">
-<title>SPIE 2027 · Explore the Setup</title>
+<title>SPIE Medical Imaging 2027 | Paper 14520-56</title>
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.4.0/model-viewer.min.js"></script>
 <style>
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;height:100%;overflow:hidden}
@@ -25,11 +25,37 @@ button{font-family:inherit;cursor:pointer}
 #loading.hide{opacity:0;visibility:hidden}
 #hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);white-space:nowrap;color:#e7f8ff;background:#102e42bf;padding:7px 11px;border-radius:8px;font-size:11px;pointer-events:none}
 @media(max-height:520px){main{gap:6px;padding:8px}h1{font-size:17px}.mode{min-height:42px}#ar-button{padding:10px}}
+
+.paper-header{text-align:center;flex:none}
+.conference{font-size:clamp(13px,2.8vw,17px);font-weight:750;color:#8ce5ed;letter-spacing:.045em}
+.paper-id{font-size:12px;color:#b4cad7;margin-top:2px}
+.paper-header h1{margin:4px auto 3px;max-width:820px;font-size:clamp(17px,3.3vw,24px);line-height:1.15;letter-spacing:-.02em}
+.authors{font-size:clamp(11px,2vw,13px);font-weight:650;line-height:1.3}
+.affiliation{font-size:clamp(10px,1.85vw,12px);color:#bdd3df;line-height:1.3;margin-top:2px}
+#ar-button{top:12px;right:12px;bottom:auto;display:flex;align-items:center;gap:7px;padding:10px 13px;font-size:13px;border-radius:10px}
+#ar-button svg,#video-button svg{width:20px;height:20px;flex:none}
+#video-button{position:absolute;top:12px;left:12px;z-index:5;display:flex;align-items:center;gap:7px;border:1px solid #81a5b5;border-radius:10px;background:#102d42e8;color:#f2fdff;padding:10px 13px;font-size:13px;font-weight:750;box-shadow:0 5px 18px #0004}
+#video-button:focus-visible{outline:3px solid white;outline-offset:2px}
+.compatibility{font-size:11px;line-height:1.3;text-align:center;color:#b9d2dd}
+#video-dialog{border:1px solid #617d8d;border-radius:15px;background:#102b3e;color:#fff;padding:14px;width:min(92vw,850px);max-height:90dvh;box-shadow:0 14px 65px #000b}
+#video-dialog::backdrop{background:#020b14d9}
+.video-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;font-weight:750}
+#close-video{border:1px solid #8bacbc;border-radius:8px;color:#fff;background:#23465a;padding:7px 12px}
+#demo-video{display:block;width:100%;max-height:70dvh;background:#000;border-radius:8px}
+#video-error{color:#ffcfad;font-size:13px;margin:10px 0 0}
+@media(max-height:650px){.conference{font-size:13px}.paper-header h1{font-size:16px}.authors,.affiliation{font-size:10px}main{gap:6px;padding:7px}.compatibility{font-size:10px}}
+@media(max-width:420px){#ar-button,#video-button{font-size:12px;padding:8px 9px;gap:5px}#ar-button svg,#video-button svg{width:18px;height:18px}}
 </style>
 </head>
 <body>
 <main>
- <h1>One Workflow · Two Trackers</h1>
+ <header class="paper-header">
+  <div class="conference">SPIE Medical Imaging 2027</div>
+  <div class="paper-id">Paper 14520-56</div>
+  <h1>A Modular Registration Platform for Image-Guided Interventions</h1>
+  <div class="authors">Javier Moviglia · Lukas Kuntz · Nikita Dolgov · Jan Stallkamp · Marius Siegfarth</div>
+  <div class="affiliation">Mannheim Institute for Intelligent Systems in Medicine (MIISM), Heidelberg University<br>Mannheim, Germany</div>
+ </header>
  <div class="stage">
   <model-viewer id="model"
     src="./models/ndi-polaris.glb"
@@ -51,8 +77,9 @@ button{font-family:inherit;cursor:pointer}
     ar-modes="webxr scene-viewer quick-look"
     loading="eager"
     reveal="auto">
-    <button slot="ar-button" id="ar-button" type="button">View in AR</button>
+    <button slot="ar-button" id="ar-button" type="button" aria-label="View setup in augmented reality"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 8 4.5v9L12 20l-8-4.5v-9L12 2Z"/><path d="m4 6.5 8 4.5 8-4.5M12 11v9"/><path d="M2 2v4M2 2h4M22 2h-4M22 2v4M2 22v-4M2 22h4M22 22h-4M22 22v-4"/></svg><span>View in AR</span></button>
   </model-viewer>
+  <button id="video-button" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="3"/><path d="m10 9 5 3-5 3V9Z"/></svg><span>Demo video</span></button>
   <div id="loading">Loading 3D setup…</div>
   <div id="hint">Drag to rotate · Pinch to zoom</div>
  </div>
@@ -60,8 +87,14 @@ button{font-family:inherit;cursor:pointer}
   <button id="ndi" class="mode" aria-pressed="true">NDI Polaris</button>
   <button id="nir" class="mode" aria-pressed="false">Monocular NIR</button>
  </div>
+ <div class="compatibility">AR availability depends on your device and browser; the interactive 3D viewer works even when AR is not supported.</div>
  <div id="message" aria-live="polite">Choose a tracker, then place the setup in your space.</div>
 </main>
+<dialog id="video-dialog" aria-label="Demonstration video">
+ <div class="video-head"><span>Platform demonstration</span><button id="close-video" type="button">Close ✕</button></div>
+ <video id="demo-video" controls playsinline preload="none"><source src="./demo.mp4" type="video/mp4">Your browser does not support HTML5 video.</video>
+ <p id="video-error" hidden>Demo video not available yet. Add a file named <strong>demo.mp4</strong> to the repository root.</p>
+</dialog>
 <script>
 (()=>{
  const viewer=document.getElementById('model');
@@ -70,6 +103,18 @@ button{font-family:inherit;cursor:pointer}
  const loading=document.getElementById('loading');
  const ar=document.getElementById('ar-button');
  const ndi=document.getElementById('ndi'),nir=document.getElementById('nir');
+ const dialog=document.getElementById('video-dialog');
+ const video=document.getElementById('demo-video');
+ const videoError=document.getElementById('video-error');
+ document.getElementById('video-button').addEventListener('click',()=>{
+   videoError.hidden=true;
+   dialog.showModal();
+   video.load();
+ });
+ document.getElementById('close-video').addEventListener('click',()=>dialog.close());
+ dialog.addEventListener('close',()=>video.pause());
+ dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close()});
+ video.addEventListener('error',()=>{videoError.hidden=false});
  const models={
    ndi:{url:'./models/ndi-polaris.glb',alt:'Setup with NDI Polaris stereo optical tracker'},
    nir:{url:'./models/monocular-nir.glb',alt:'Setup with monocular near-infrared camera and ArUco marker'}
